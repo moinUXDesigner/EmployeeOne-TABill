@@ -29,20 +29,37 @@ const btnSuccess = btn(C.successBg, C.success, C.successBorder);
 const btnDanger = btn(C.dangerBg, C.danger, C.dangerBorder);
 const card = { background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: '20px 24px' };
 
-const ROLES = { EMPLOYEE: 'EMPLOYEE', SUPERVISOR: 'SUPERVISOR', FINANCE: 'FINANCE', ADMIN: 'ADMIN' };
+const ROLES = {
+  EMPLOYEE:    'EMPLOYEE',
+  JAO_BILLS:   'JAO_BILLS',
+  JAO_CASH:    'JAO_CASH',
+  AAO_CASH:    'AAO_CASH',
+  AO_CASH:     'AO_CASH',
+  PAY_OFFICER: 'PAY_OFFICER',
+  FINANCE:     'FINANCE',
+  ADMIN:       'ADMIN',
+};
 
 const USERS = [
-  { id: 'U001', name: 'K. Praveen Kumar', empId: '1073091', designation: 'Assistant Executive Engineer', role: ROLES.EMPLOYEE, hq: 'VS, Vijayawada', dept: 'IT Applications', av: 'KP' },
-  { id: 'U002', name: 'T. Ramesh Kumar', empId: '1073045', designation: 'Deputy Executive Engineer', role: ROLES.SUPERVISOR, hq: 'VS, Vijayawada', dept: 'IT Applications', av: 'TR' },
-  { id: 'U003', name: 'S. Lakshmi Devi', empId: '1073012', designation: 'Accounts Officer', role: ROLES.FINANCE, hq: 'Circle Office, Ongole', dept: 'Finance & Accounts', av: 'SL' },
-  { id: 'U004', name: 'Admin User', empId: 'ADMIN01', designation: 'System Administrator', role: ROLES.ADMIN, hq: 'Corporate Office, Hyderabad', dept: 'IT Systems', av: 'AU' },
+  { id: 'U001', name: 'K. Praveen Kumar',  empId: '1073091', designation: 'Assistant Executive Engineer', role: ROLES.EMPLOYEE,    hq: 'VS, Vijayawada',              dept: 'IT Applications',    av: 'KP', phone: '' },
+  { id: 'U002', name: 'T. Ramesh Kumar',   empId: '1073045', designation: 'Deputy Executive Engineer',   role: ROLES.JAO_BILLS,   hq: 'VS, Vijayawada',              dept: 'Finance & Accounts', av: 'TR', phone: '' },
+  { id: 'U003', name: 'S. Lakshmi Devi',   empId: '1073012', designation: 'AAO (Other Bills)',           role: ROLES.AAO_CASH,    hq: 'Circle Office, Ongole',       dept: 'Finance & Accounts', av: 'SL', phone: '' },
+  { id: 'U005', name: 'V. Srinivasan',     empId: 'JAO001',  designation: 'JAO (Cash) — F-53',          role: ROLES.JAO_CASH,    hq: 'Corporate Office, Hyderabad', dept: 'Cash Section',        av: 'VS', phone: '9848167287' },
+  { id: 'U006', name: 'P. Malleswari',     empId: 'PO001',   designation: 'Pay Officer',                role: ROLES.PAY_OFFICER, hq: 'Corporate Office, Hyderabad', dept: 'Finance & Accounts', av: 'ML', phone: '9949635652' },
+  { id: 'U007', name: 'Murthy',            empId: 'AO001',   designation: 'AO (Cash)',                  role: ROLES.AO_CASH,     hq: 'Corporate Office, Hyderabad', dept: 'Cash Section',        av: 'MU', phone: '' },
+  { id: 'U008', name: 'Murthy (GM)',        empId: 'GM001',   designation: 'GM (Finance)',               role: ROLES.FINANCE,     hq: 'Corporate Office, Hyderabad', dept: 'Finance & Accounts', av: 'MG', phone: '9398417653' },
+  { id: 'U004', name: 'Admin User',         empId: 'ADMIN01', designation: 'System Administrator',      role: ROLES.ADMIN,       hq: 'Corporate Office, Hyderabad', dept: 'IT Systems',          av: 'AU', phone: '' },
 ];
 
 const ROLE_LABELS = {
-  [ROLES.EMPLOYEE]: 'Employee — Submit & track your TA bills',
-  [ROLES.SUPERVISOR]: 'Supervisor (DEE) — Review & approve TA bills',
-  [ROLES.FINANCE]: 'Finance Officer — View & process payments',
-  [ROLES.ADMIN]: 'System Admin — Full access & audit logs',
+  [ROLES.EMPLOYEE]:    'Employee — Submit & track TA bills',
+  [ROLES.JAO_BILLS]:   'JAO (Other Bills) — Scrutiny, Pass Order & FV-60',
+  [ROLES.JAO_CASH]:    'JAO (Cash) — LOC Process & F-53 Posting',
+  [ROLES.AAO_CASH]:    'AAO (Cash) — Approve bills < ₹50,000',
+  [ROLES.AO_CASH]:     'AO (Cash) — Approve bills ₹50,000 – ₹5,00,000',
+  [ROLES.PAY_OFFICER]: 'Pay Officer — Payment oversight',
+  [ROLES.FINANCE]:     'GM/CGM Finance — Overall view',
+  [ROLES.ADMIN]:       'System Admin — Full access & audit logs',
 };
 
 const INIT_BILLS = [
@@ -58,9 +75,10 @@ const INIT_BILLS = [
       { id: 'J4', dateFrom: '2024-02-27', dateTo: '2024-02-27', fromLoc: 'Circle Office, Ongole', toLoc: 'VS, Vijayawada', purpose: 'Return journey', mode: 'Bus', distKm: 150, mileageAmt: 0, noDays: 0, daAmt: 0, railAmt: 0, roadConv: 0, total: 0, remarks: '' },
     ],
     totalMileage: 0, totalDA: 400, totalRailway: 760, totalRoad: 0, grandTotal: 1160,
-    certs: [true, true, true], status: 'forwarded_ro',
+    certs: [true, true, true], status: 'fv60_posted',
     submittedAt: '2024-03-01T09:15:00Z', reviewedBy: 'U002', reviewedAt: '2024-03-02T10:30:00Z',
-    approvedBy: 'U002', approvedAt: '2024-03-02T11:00:00Z', remarks: 'Approved. All documents verified.',
+    approvedBy: 'U002', approvedAt: '2024-03-02T11:00:00Z', remarks: 'Pass order created. FV-60 posted.',
+    passOrderNo: 'PO/2024/02/001', sapDocNo: 'SAP5100001234', inwardNo: 'IW/2024/0312',
   },
   {
     id: 'B002', billNo: 'TA/2024/03/001',
@@ -72,9 +90,9 @@ const INIT_BILLS = [
       { id: 'J6', dateFrom: '2024-03-15', dateTo: '2024-03-15', fromLoc: 'Vizianagaram', toLoc: 'VS, Vijayawada', purpose: 'Return journey', mode: 'Bus', distKm: 180, mileageAmt: 0, noDays: 0, daAmt: 0, railAmt: 0, roadConv: 0, total: 0, remarks: '' },
     ],
     totalMileage: 0, totalDA: 400, totalRailway: 900, totalRoad: 0, grandTotal: 1300,
-    certs: [true, true, true], status: 'submitted',
-    submittedAt: '2024-04-03T10:00:00Z', reviewedBy: null, reviewedAt: null,
-    approvedBy: null, approvedAt: null, remarks: '',
+    certs: [true, true, true], status: 'scrutiny',
+    submittedAt: '2024-04-03T10:00:00Z', reviewedBy: 'U002', reviewedAt: '2024-04-04T09:00:00Z',
+    approvedBy: null, approvedAt: null, remarks: '', inwardNo: 'IW/2024/0401',
   },
   {
     id: 'B003', billNo: 'TA/2024/04/002',
@@ -86,9 +104,9 @@ const INIT_BILLS = [
       { id: 'J8', dateFrom: '2024-04-11', dateTo: '2024-04-11', fromLoc: 'Hyderabad', toLoc: 'VS, Vijayawada', purpose: 'Return journey', mode: 'Rail', distKm: 440, mileageAmt: 0, noDays: 0, daAmt: 0, railAmt: 2400, roadConv: 0, total: 2400, remarks: '2nd AC' },
     ],
     totalMileage: 0, totalDA: 1000, totalRailway: 4800, totalRoad: 0, grandTotal: 5800,
-    certs: [true, true, true], status: 'under_review',
+    certs: [true, true, true], status: 'pass_order',
     submittedAt: '2024-04-20T14:00:00Z', reviewedBy: 'U002', reviewedAt: '2024-04-21T09:00:00Z',
-    approvedBy: null, approvedAt: null, remarks: '',
+    approvedBy: null, approvedAt: null, remarks: '', passOrderNo: 'PO/2024/04/002', inwardNo: 'IW/2024/0418',
   },
   {
     id: 'B004', billNo: 'TA/2024/03/007',
@@ -99,9 +117,10 @@ const INIT_BILLS = [
       { id: 'J9', dateFrom: '2024-03-22', dateTo: '2024-03-22', fromLoc: 'VS, Vijayawada', toLoc: 'Tirupati', purpose: 'Official coordination meeting — Grid expansion project', mode: 'Own Vehicle', distKm: 220, mileageAmt: 1760, noDays: 1, daAmt: 500, railAmt: 0, roadConv: 0, total: 2260, remarks: '' },
     ],
     totalMileage: 1760, totalDA: 500, totalRailway: 0, totalRoad: 0, grandTotal: 2260,
-    certs: [true, true, true], status: 'forwarded_rvo',
-    submittedAt: '2024-04-05T11:00:00Z', reviewedBy: 'U004', reviewedAt: '2024-04-06T10:00:00Z',
-    approvedBy: 'U004', approvedAt: '2024-04-06T10:30:00Z', remarks: 'Approved by Admin.',
+    certs: [true, true, true], status: 'loc_processing',
+    submittedAt: '2024-04-05T11:00:00Z', reviewedBy: 'U002', reviewedAt: '2024-04-06T10:00:00Z',
+    approvedBy: 'U005', approvedAt: '2024-04-06T10:30:00Z', remarks: 'LOC initiated by JAO Cash.',
+    passOrderNo: 'PO/2024/03/007', sapDocNo: 'SAP5100001200', inwardNo: 'IW/2024/0404',
   },
   {
     id: 'B005', billNo: 'TA/2024/04/009',
@@ -136,15 +155,18 @@ const fmtDate = s => s ? new Date(s).toLocaleDateString('en-IN', { day: '2-digit
 const fmtTs = s => s ? new Date(s).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
 const STATUS = {
-  draft:               { label: 'Draft',              bg: '#F3F4F6', color: '#374151', border: '#D1D5DB' },
-  submitted:           { label: 'Submitted',          bg: C.warningBg, color: C.warning, border: C.warningBorder },
-  under_review:        { label: 'Under Review',       bg: C.infoBg, color: C.info, border: C.infoBorder },
-  forwarded_ro:        { label: 'Forwarded by RO',     bg: C.successBg, color: C.success, border: C.successBorder },
-  forwarded_rvo:       { label: 'Forwarded by RVO',    bg: '#CFFAFE', color: '#0E7490', border: '#67E8F9' },
-  rejected:            { label: 'Rejected',           bg: C.dangerBg, color: C.danger, border: C.dangerBorder },
-  payment_processing:  { label: 'Payment Processing', bg: '#F3E8FF', color: '#7C3AED', border: '#C4B5FD' },
-  loc_processing:      { label: 'LOC Under Process',  bg: '#FEF9C3', color: '#92400E', border: '#FDE68A' },
-  paid:                { label: 'Paid',               bg: '#D1FAE5', color: '#065F46', border: '#6EE7B7' },
+  draft:          { label: 'Draft',                bg: '#F3F4F6',  color: '#374151', border: '#D1D5DB' },
+  submitted:      { label: 'Submitted',            bg: C.warningBg, color: C.warning, border: C.warningBorder },
+  scrutiny:       { label: 'Under Scrutiny',       bg: '#FEF3C7',  color: '#92400E', border: '#FCD34D' },
+  pass_order:     { label: 'Pass Order Created',   bg: C.infoBg,   color: C.info,    border: C.infoBorder },
+  fv60_posted:    { label: 'FV-60 Posted (SAP)',   bg: '#F3E8FF',  color: '#7C3AED', border: '#C4B5FD' },
+  cash_pending:   { label: 'Cash Section Pending', bg: '#CFFAFE',  color: '#0E7490', border: '#67E8F9' },
+  aao_approved:   { label: 'AAO Approved',         bg: C.successBg, color: C.success, border: C.successBorder },
+  ao_approved:    { label: 'AO Approved',          bg: '#D1FAE5',  color: '#065F46', border: '#6EE7B7' },
+  loc_processing: { label: 'LOC Under Process',    bg: '#FEF9C3',  color: '#92400E', border: '#FDE68A' },
+  f53_posted:     { label: 'F-53 Posted',          bg: '#DCFCE7',  color: '#15803D', border: '#86EFAC' },
+  paid:           { label: 'Paid',                 bg: '#D1FAE5',  color: '#065F46', border: '#6EE7B7' },
+  rejected:       { label: 'Rejected',             bg: C.dangerBg, color: C.danger,  border: C.dangerBorder },
 };
 
 const Badge = ({ status }) => {
@@ -212,21 +234,28 @@ function LoginPage({ onLogin }) {
 }
 
 function Sidebar({ user, page, onNav, onLogout }) {
-  const canApprove = [ROLES.SUPERVISOR, ROLES.ADMIN].includes(user.role);
-  const canViewAll = [ROLES.FINANCE, ROLES.ADMIN].includes(user.role);
-  const isAdmin = user.role === ROLES.ADMIN;
-  const notEmployee = user.role !== ROLES.EMPLOYEE;
+  const isEmployee    = user.role === ROLES.EMPLOYEE;
+  const isJAOBills    = user.role === ROLES.JAO_BILLS;
+  const isJAOCash     = user.role === ROLES.JAO_CASH;
+  const isCashApprover= [ROLES.AAO_CASH, ROLES.AO_CASH].includes(user.role);
+  const canViewAll    = [ROLES.FINANCE, ROLES.ADMIN, ROLES.PAY_OFFICER].includes(user.role);
+  const isAdmin       = user.role === ROLES.ADMIN;
+  const financeSection= [ROLES.JAO_BILLS, ROLES.JAO_CASH, ROLES.AAO_CASH, ROLES.AO_CASH, ROLES.PAY_OFFICER, ROLES.FINANCE, ROLES.ADMIN].includes(user.role);
 
   const items = [
-    { p: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
-    { p: 'submit', label: 'Submit TA Bill', Icon: Plus, hide: user.role === ROLES.FINANCE },
-    { p: 'mybills', label: 'My Bills', Icon: FileText, hide: notEmployee },
-    { p: 'approvals', label: 'Pending Approvals', Icon: Inbox, hide: !canApprove },
-    { p: 'allbills', label: 'All Bills', Icon: FileText, hide: !canViewAll },
-    { p: 'finance', label: 'Process Payments', Icon: IndianRupee, hide: !canViewAll },
-    { p: 'reports', label: 'Reports', Icon: BarChart3, hide: !canViewAll },
-    { p: 'auditlog', label: 'Audit Log', Icon: Activity, hide: !isAdmin },
-    { p: 'users', label: 'User Management', Icon: Users, hide: !isAdmin },
+    { p: 'dashboard',    label: 'Dashboard',          Icon: LayoutDashboard },
+    { p: 'submit',       label: 'Submit TA Bill',      Icon: Plus,        hide: !isEmployee },
+    { p: 'mybills',      label: 'My Bills',            Icon: FileText,    hide: !isEmployee },
+    { p: 'scrutiny',     label: 'Scrutiny Queue',      Icon: Inbox,       hide: !isJAOBills },
+    { p: 'fv60',         label: 'FV-60 Posting (SAP)', Icon: CheckSquare, hide: !isJAOBills },
+    { p: 'cash_queue',   label: 'Cash Section Queue',  Icon: Inbox,       hide: !(isJAOCash || isCashApprover) },
+    { p: 'f53',          label: 'F-53 Posting (SAP)',  Icon: IndianRupee, hide: !isJAOCash },
+    { p: 'allbills',     label: 'All Bills',           Icon: FileText,    hide: !canViewAll },
+    { p: 'finance',      label: 'Payment Tracker',     Icon: BarChart3,   hide: !financeSection },
+    { p: 'reports',      label: 'Reports',             Icon: BarChart3,   hide: !canViewAll },
+    { p: 'team',         label: 'Team Directory',      Icon: Users,       hide: !financeSection },
+    { p: 'auditlog',     label: 'Audit Log',           Icon: Activity,    hide: !isAdmin },
+    { p: 'users',        label: 'User Management',     Icon: Users,       hide: !isAdmin },
   ].filter(i => !i.hide);
 
   return (
@@ -267,7 +296,14 @@ function Sidebar({ user, page, onNav, onLogout }) {
 }
 
 function TopBar({ user, page, onLogout, pendingCount }) {
-  const TITLES = { dashboard: 'Dashboard', submit: 'Submit TA Bill', mybills: 'My Bills', approvals: 'Pending Approvals', allbills: 'All Bills', finance: 'Process Payments', finance_payment: 'Post Vendor Invoice — FV60', reports: 'Reports', auditlog: 'Audit Log', users: 'User Management' };
+  const TITLES = {
+    dashboard: 'Dashboard', submit: 'Submit TA Bill', mybills: 'My Bills',
+    scrutiny: 'Scrutiny Queue — JAO (Other Bills)', fv60: 'FV-60 Posting — SAP Entry',
+    cash_queue: 'Cash Section Queue', f53: 'F-53 Posting — SAP Payment',
+    allbills: 'All Bills', finance: 'Payment Tracker',
+    finance_payment: 'Post Vendor Invoice — FV-60', f53_form: 'Post Payment — F-53',
+    reports: 'Reports', auditlog: 'Audit Log', users: 'User Management', team: 'Team Directory',
+  };
   return (
     <div style={{ height: 60, background: '#fff', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 24px 0 20px', position: 'fixed', top: 0, left: 256, right: 0, zIndex: 99, fontFamily: 'Segoe UI, sans-serif' }}>
       <div style={{ flex: 1 }}>
@@ -295,31 +331,38 @@ function TopBar({ user, page, onLogout, pendingCount }) {
 function Dashboard({ user, bills, onNav }) {
   const isEmp = user.role === ROLES.EMPLOYEE;
   const scopedBills = isEmp ? bills.filter(b => b.employeeId === user.id) : bills;
-  const pending = bills.filter(b => ['submitted', 'under_review'].includes(b.status));
-  const approved = scopedBills.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status));
-  const totalApproved = approved.reduce((s, b) => s + b.grandTotal, 0);
+  const paid = scopedBills.filter(b => ['f53_posted', 'paid'].includes(b.status));
+  const totalPaid = paid.reduce((s, b) => s + b.grandTotal, 0);
   const myDrafts = bills.filter(b => b.employeeId === user.id && b.status === 'draft');
+
+  const scrutinyQueue = bills.filter(b => b.status === 'submitted');
+  const passOrderQueue = bills.filter(b => b.status === 'scrutiny');
+  const fv60Queue     = bills.filter(b => b.status === 'pass_order');
+  const cashQueue     = bills.filter(b => ['fv60_posted', 'cash_pending'].includes(b.status));
+  const locQueue      = bills.filter(b => b.status === 'loc_processing');
+  const approvalQueue = bills.filter(b => ['fv60_posted', 'cash_pending'].includes(b.status));
 
   const metrics = [
     { label: isEmp ? 'My Bills' : 'Total Bills', val: scopedBills.length, Icon: FileText, c: C.primary, bg: C.primaryLight },
-    { label: 'Pending Approval', val: isEmp ? scopedBills.filter(b => ['submitted', 'under_review'].includes(b.status)).length : pending.length, Icon: Clock, c: C.warning, bg: C.warningBg },
-    { label: 'Approved Bills', val: approved.length, Icon: CheckCircle, c: C.success, bg: C.successBg },
-    { label: 'Total Approved Amt', val: fmtAmt(totalApproved), Icon: IndianRupee, c: '#B45309', bg: '#FEF3C7' },
+    { label: isEmp ? 'In Progress' : 'Pending Processing', val: isEmp ? scopedBills.filter(b => !['draft','paid','f53_posted','rejected'].includes(b.status)).length : scrutinyQueue.length + fv60Queue.length, Icon: Clock, c: C.warning, bg: C.warningBg },
+    { label: isEmp ? 'Paid Bills' : 'LOC Processing', val: isEmp ? paid.length : locQueue.length, Icon: CheckCircle, c: C.success, bg: C.successBg },
+    { label: isEmp ? 'Total Paid Amt' : 'Total Paid Amt', val: fmtAmt(totalPaid), Icon: IndianRupee, c: '#B45309', bg: '#FEF3C7' },
   ];
 
-  const forwardedRVO   = bills.filter(b => b.status === 'forwarded_rvo');
-  const forwardedRO    = bills.filter(b => b.status === 'forwarded_ro');
-  const locBills       = bills.filter(b => b.status === 'loc_processing');
   const actions = [
-    ...(myDrafts.length > 0 ? [{ txt: `${myDrafts.length} draft bill(s) not yet submitted`, pri: 'High', nav: 'submit', due: 'Submit before month-end to avoid delays' }] : []),
-    ...([ROLES.SUPERVISOR, ROLES.ADMIN].includes(user.role) && pending.length > 0 ? [{ txt: `${pending.length} TA bill(s) awaiting your approval`, pri: 'High', nav: 'approvals', due: 'Review within 3 working days as per APTRANSCO policy' }] : []),
-    ...(isEmp && scopedBills.filter(b => b.status === 'submitted').length > 0 ? [{ txt: `${scopedBills.filter(b => b.status === 'submitted').length} bill(s) pending DEE review`, pri: 'Medium', nav: 'mybills', due: 'Pending with supervisor' }] : []),
-    ...(user.role === ROLES.FINANCE && forwardedRVO.length > 0 ? [{ txt: `${forwardedRVO.length} bill(s) forwarded by RVO pending Pass Order`, pri: 'High', nav: 'finance', due: 'Post vendor invoice (FV60) to issue Pass Order' }] : []),
-    ...(user.role === ROLES.FINANCE && forwardedRO.length > 0 ? [{ txt: `${forwardedRO.length} bill(s) forwarded by RO awaiting RVO clearance`, pri: 'Medium', nav: 'finance', due: 'Pending RVO forwarding before Pass Order can be issued' }] : []),
-    ...(user.role === ROLES.FINANCE && locBills.length > 0 ? [{ txt: `${locBills.length} bill(s) in LOC processing stage`, pri: 'Medium', nav: 'finance', due: 'Ensure LOC is cleared for disbursement' }] : []),
+    ...(myDrafts.length > 0 ? [{ txt: `${myDrafts.length} draft bill(s) not yet submitted`, pri: 'High', nav: 'submit', due: 'Submit before month-end' }] : []),
+    ...(user.role === ROLES.JAO_BILLS && scrutinyQueue.length > 0 ? [{ txt: `${scrutinyQueue.length} bill(s) received — pending scrutiny & Pass Order`, pri: 'High', nav: 'scrutiny', due: 'Verify bill, correct amounts if needed, create Pass Order' }] : []),
+    ...(user.role === ROLES.JAO_BILLS && fv60Queue.length > 0 ? [{ txt: `${fv60Queue.length} bill(s) with Pass Order — pending FV-60 SAP entry`, pri: 'High', nav: 'fv60', due: 'Post FV-60 in SAP against Employee ID' }] : []),
+    ...(user.role === ROLES.JAO_CASH && cashQueue.length > 0 ? [{ txt: `${cashQueue.length} bill(s) received from Bills Section — initiate LOC`, pri: 'High', nav: 'cash_queue', due: 'Initiate Letter of Credit (LOC) for payment processing' }] : []),
+    ...(user.role === ROLES.JAO_CASH && locQueue.length > 0 ? [{ txt: `${locQueue.length} bill(s) LOC approved — post F-53 in SAP`, pri: 'High', nav: 'f53', due: 'Post payment in SAP using T-Code F-53' }] : []),
+    ...([ROLES.AAO_CASH, ROLES.AO_CASH].includes(user.role) && approvalQueue.filter(b => user.role === ROLES.AAO_CASH ? b.grandTotal < 50000 : b.grandTotal >= 50000).length > 0 ? [{
+      txt: `${approvalQueue.filter(b => user.role === ROLES.AAO_CASH ? b.grandTotal < 50000 : b.grandTotal >= 50000).length} bill(s) pending your approval`,
+      pri: 'High', nav: 'cash_queue',
+      due: user.role === ROLES.AAO_CASH ? 'Bills below ₹50,000 require AAO approval' : 'Bills ₹50,000–₹5,00,000 require AO approval',
+    }] : []),
   ];
 
-  const recentBills = [...scopedBills].sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0)).slice(0, 5);
+  const recentBills = [...scopedBills].sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0)).slice(0, 8);
 
   return (
     <div style={{ fontFamily: 'Segoe UI, sans-serif' }}>
@@ -601,10 +644,67 @@ function BillsTable({ bills, currentUser, onView }) {
   );
 }
 
-function BillDetail({ bill, currentUser, onClose, onApprove, onReject }) {
+const PROCESS_STEPS = [
+  { key: 'submitted',      label: 'Bill Submitted',         who: 'Employee' },
+  { key: 'scrutiny',       label: 'Under Scrutiny',         who: 'JAO (Bills)' },
+  { key: 'pass_order',     label: 'Pass Order Created',     who: 'JAO (Bills)' },
+  { key: 'fv60_posted',    label: 'FV-60 Posted in SAP',    who: 'AAO (Bills)' },
+  { key: 'cash_pending',   label: 'Cash Section Received',  who: 'JAO (Cash)' },
+  { key: 'loc_processing', label: 'LOC Initiated',          who: 'JAO (Cash)' },
+  { key: 'aao_approved',   label: 'AAO Approved (<50k)',     who: 'AAO (Cash)' },
+  { key: 'ao_approved',    label: 'AO Approved (>50k)',      who: 'AO (Cash)' },
+  { key: 'f53_posted',     label: 'F-53 Posted — Payment',  who: 'JAO (Cash)' },
+];
+
+function ProcessTimeline({ bill }) {
+  const ORDER = ['submitted','scrutiny','pass_order','fv60_posted','cash_pending','loc_processing',
+                 bill && bill.grandTotal < 50000 ? 'aao_approved' : 'ao_approved','f53_posted'];
+  const cur = ORDER.indexOf(bill.status);
+  return (
+    <div style={{ marginBottom: 16, padding: '16px 20px', background: '#F8FAFF', border: `1px solid ${C.infoBorder}`, borderRadius: 10 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Process Flow</div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0, overflowX: 'auto', paddingBottom: 4 }}>
+        {ORDER.map((key, i) => {
+          const step = PROCESS_STEPS.find(s => s.key === key) || { label: key, who: '' };
+          const done = cur > i;
+          const active = cur === i;
+          const rejected = bill.status === 'rejected';
+          return (
+            <div key={key} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ textAlign: 'center', width: 90 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', margin: '0 auto 6px',
+                  background: done ? C.success : active ? (rejected ? C.danger : C.primary) : C.borderLight,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: `2px solid ${done ? C.success : active ? (rejected ? C.danger : C.primary) : C.border}` }}>
+                  {done ? <CheckCircle size={14} color="#fff" /> : <span style={{ fontSize: 10, fontWeight: 700, color: active ? '#fff' : C.textMuted }}>{i + 1}</span>}
+                </div>
+                <div style={{ fontSize: 10, color: active ? C.primary : done ? C.success : C.textMuted, fontWeight: active || done ? 600 : 400, lineHeight: 1.3 }}>{step.label}</div>
+                <div style={{ fontSize: 9, color: C.textDisabled, marginTop: 2 }}>{step.who}</div>
+              </div>
+              {i < ORDER.length - 1 && <div style={{ width: 20, height: 2, background: done ? C.success : C.borderLight, flexShrink: 0, marginBottom: 18 }} />}
+            </div>
+          );
+        })}
+      </div>
+      {bill.passOrderNo && <div style={{ marginTop: 10, fontSize: 12, color: C.textSec }}>Pass Order: <strong>{bill.passOrderNo}</strong>{bill.sapDocNo && <> &nbsp;·&nbsp; SAP Doc: <strong>{bill.sapDocNo}</strong></>}{bill.inwardNo && <> &nbsp;·&nbsp; Inward No: <strong>{bill.inwardNo}</strong></>}</div>}
+    </div>
+  );
+}
+
+function BillDetail({ bill, currentUser, onClose, onApprove, onReject, onPassOrder, onFV60, onCashReceive, onLOC, onCashApprove, onF53 }) {
   const [rejectReason, setRejectReason] = useState('');
   const [rejectMode, setRejectMode] = useState(false);
-  const canAct = [ROLES.SUPERVISOR, ROLES.ADMIN].includes(currentUser.role) && ['submitted', 'under_review'].includes(bill.status);
+  const [passOrderNo, setPassOrderNo] = useState('');
+  const [inwardNo, setInwardNo] = useState(bill.inwardNo || '');
+
+  const canScrutiny   = currentUser.role === ROLES.JAO_BILLS && bill.status === 'submitted';
+  const canPassOrder  = currentUser.role === ROLES.JAO_BILLS && bill.status === 'scrutiny';
+  const canFV60       = currentUser.role === ROLES.JAO_BILLS && bill.status === 'pass_order';
+  const canCashRcv    = currentUser.role === ROLES.JAO_CASH  && bill.status === 'fv60_posted';
+  const canLOC        = currentUser.role === ROLES.JAO_CASH  && bill.status === 'cash_pending';
+  const canAct = (currentUser.role === ROLES.ADMIN && ['submitted','scrutiny'].includes(bill.status)) ||
+                 (currentUser.role === ROLES.AAO_CASH && ['cash_pending','fv60_posted'].includes(bill.status) && bill.grandTotal < 50000) ||
+                 (currentUser.role === ROLES.AO_CASH  && ['cash_pending','fv60_posted'].includes(bill.status) && bill.grandTotal >= 50000);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(17,24,39,0.45)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', fontFamily: 'Segoe UI, sans-serif' }}>
@@ -621,6 +721,7 @@ function BillDetail({ bill, currentUser, onClose, onApprove, onReject }) {
         </div>
 
         <div style={{ padding: '20px 24px' }}>
+          <ProcessTimeline bill={bill} />
           <div style={{ ...card, marginBottom: 16 }}>
             <h4 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Employee Details</h4>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -672,7 +773,7 @@ function BillDetail({ bill, currentUser, onClose, onApprove, onReject }) {
             {[
               bill.submittedAt && { label: 'Submitted', by: bill.employeeName, at: bill.submittedAt, c: C.warning },
               bill.reviewedAt && { label: 'Under Review', by: USERS.find(u => u.id === bill.reviewedBy)?.name || '', at: bill.reviewedAt, c: C.info },
-              bill.approvedAt && { label: bill.status === 'rejected' ? 'Rejected' : 'Approved', by: USERS.find(u => u.id === bill.approvedBy)?.name || '', at: bill.approvedAt, c: bill.status === 'rejected' ? C.danger : C.success },
+              bill.approvedAt && { label: bill.status === 'rejected' ? 'Rejected' : STATUS[bill.status]?.label || 'Approved', by: USERS.find(u => u.id === bill.approvedBy)?.name || '', at: bill.approvedAt, c: bill.status === 'rejected' ? C.danger : C.success },
             ].filter(Boolean).map((t, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 10, alignItems: 'flex-start' }}>
                 <div style={{ width: 9, height: 9, borderRadius: '50%', background: t.c, flexShrink: 0, marginTop: 5 }} />
@@ -686,21 +787,90 @@ function BillDetail({ bill, currentUser, onClose, onApprove, onReject }) {
             {bill.remarks && <div style={{ marginTop: 8, padding: '8px 12px', background: C.bg, borderRadius: 6, fontSize: 13, color: C.textSec, fontStyle: 'italic' }}>"{bill.remarks}"</div>}
           </div>
 
+          {canScrutiny && (
+            <div style={{ ...card, border: `2px solid ${C.infoBorder}`, marginBottom: 12 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: C.info, textTransform: 'uppercase' }}>Step 1 — Scrutiny</h4>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: C.textSec }}>Review the bill. Modify amounts if corrections are required, then mark as under scrutiny.</p>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: C.textSec, display: 'block', marginBottom: 4 }}>Inward Number</label>
+                <input value={inwardNo} onChange={e => setInwardNo(e.target.value)} placeholder="e.g. IW/2024/0312" style={{ padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', width: 240, boxSizing: 'border-box' }} />
+              </div>
+              <button onClick={() => onPassOrder && onPassOrder(bill.id, 'scrutiny', inwardNo)} style={{ ...btn(C.infoBg, C.info, C.infoBorder), justifyContent: 'center' }}>
+                <CheckSquare size={15} /> Mark as Under Scrutiny
+              </button>
+            </div>
+          )}
+          {canPassOrder && (
+            <div style={{ ...card, border: `2px solid ${C.infoBorder}`, marginBottom: 12 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: C.info, textTransform: 'uppercase' }}>Step 2 — Create Pass Order</h4>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: C.textSec }}>Scrutiny complete. Generate Pass Order number to proceed to FV-60 SAP entry.</p>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: C.textSec, display: 'block', marginBottom: 4 }}>Pass Order Number</label>
+                <input value={passOrderNo} onChange={e => setPassOrderNo(e.target.value)} placeholder="e.g. PO/2024/04/001" style={{ padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', width: 260, boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => passOrderNo.trim() && onPassOrder && onPassOrder(bill.id, 'pass_order', inwardNo, passOrderNo)} disabled={!passOrderNo.trim()} style={{ ...btnPrimary, opacity: passOrderNo.trim() ? 1 : 0.45 }}>
+                  <CheckCircle size={15} /> Create Pass Order
+                </button>
+                {!rejectMode
+                  ? <button onClick={() => setRejectMode(true)} style={btnDanger}><XCircle size={14} /> Reject</button>
+                  : <div style={{ display: 'flex', gap: 8, flex: 1 }}>
+                      <input value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Rejection reason…" style={{ flex: 1, padding: '8px 10px', border: `1px solid ${C.dangerBorder}`, borderRadius: 6, fontSize: 13, outline: 'none' }} />
+                      <button onClick={() => rejectReason.trim() && onReject(bill.id, rejectReason)} style={{ ...btnDanger, opacity: rejectReason.trim() ? 1 : 0.45 }}>Confirm</button>
+                      <button onClick={() => setRejectMode(false)} style={btnSecondary}>Cancel</button>
+                    </div>
+                }
+              </div>
+            </div>
+          )}
+          {canFV60 && (
+            <div style={{ ...card, border: `2px solid #C4B5FD`, marginBottom: 12 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase' }}>Step 3 — FV-60 SAP Entry</h4>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: C.textSec }}>Pass Order: <strong>{bill.passOrderNo}</strong> · Amount: <strong>{fmtAmt(bill.grandTotal)}</strong></p>
+              <button onClick={() => onFV60 && onFV60(bill)} style={{ ...btn('#F3E8FF', '#7C3AED', '#C4B5FD') }}>
+                <IndianRupee size={15} /> Open FV-60 Form (SAP Entry)
+              </button>
+            </div>
+          )}
+          {canCashRcv && (
+            <div style={{ ...card, border: `2px solid #67E8F9`, marginBottom: 12 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0E7490', textTransform: 'uppercase' }}>Cash Section — Receive Bill</h4>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: C.textSec }}>SAP Doc: <strong>{bill.sapDocNo || '—'}</strong> · Amount: <strong>{fmtAmt(bill.grandTotal)}</strong></p>
+              <p style={{ margin: '0 0 12px', fontSize: 12, color: C.textMuted }}>
+                {bill.grandTotal < 50000 ? 'Below ₹50,000 — requires AAO approval' : 'Above ₹50,000 — requires AO approval'}
+              </p>
+              <button onClick={() => onCashReceive && onCashReceive(bill.id)} style={{ ...btn('#CFFAFE', '#0E7490', '#67E8F9') }}>
+                <Inbox size={15} /> Acknowledge Receipt — Initiate LOC
+              </button>
+            </div>
+          )}
+          {canLOC && (
+            <div style={{ ...card, border: `2px solid ${C.warningBorder}`, marginBottom: 12 }}>
+              <h4 style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: C.warning, textTransform: 'uppercase' }}>Initiate LOC Process</h4>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: C.textSec }}>Process B&R Check / LOC for offline payment to bank.</p>
+              <button onClick={() => onLOC && onLOC(bill.id)} style={{ ...btn(C.warningBg, C.warning, C.warningBorder) }}>
+                <Activity size={15} /> Initiate LOC (Letter of Credit)
+              </button>
+            </div>
+          )}
           {canAct && (
             <div style={{ ...card, border: `2px solid ${C.infoBorder}` }}>
-              <h4 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.info, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Approval Decision</h4>
+              <h4 style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: C.info, textTransform: 'uppercase' }}>
+                {currentUser.role === ROLES.AAO_CASH ? 'AAO Approval (Bills < ₹50,000)' : 'AO Approval (Bills ₹50,000–₹5,00,000)'}
+              </h4>
+              <p style={{ margin: '0 0 12px', fontSize: 12, color: C.textMuted }}>Amount: {fmtAmt(bill.grandTotal)}</p>
               {!rejectMode
                 ? <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => onApprove(bill.id, 'Approved after review and verification of all supporting documents.')} style={{ ...btnSuccess, flex: 1, justifyContent: 'center', padding: '10px' }}>
-                    <CheckCircle size={16} /> Approve Bill
+                  <button onClick={() => onCashApprove && onCashApprove(bill.id, currentUser.role === ROLES.AAO_CASH ? 'aao_approved' : 'ao_approved')} style={{ ...btnSuccess, flex: 1, justifyContent: 'center', padding: '10px' }}>
+                    <CheckCircle size={16} /> Approve
                   </button>
                   <button onClick={() => setRejectMode(true)} style={{ ...btnDanger, flex: 1, justifyContent: 'center', padding: '10px' }}>
-                    <XCircle size={16} /> Reject Bill
+                    <XCircle size={16} /> Reject
                   </button>
                 </div>
                 : <div>
                   <label style={{ fontSize: 13, fontWeight: 500, color: C.textSec, display: 'block', marginBottom: 6 }}>Rejection Reason (required)</label>
-                  <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} placeholder="Specify the reason for rejection with reference to relevant rules…" style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.dangerBorder}`, borderRadius: 8, fontSize: 13, outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'Segoe UI, sans-serif', color: C.text }} />
+                  <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} rows={3} placeholder="Specify reason…" style={{ width: '100%', padding: '8px 10px', border: `1px solid ${C.dangerBorder}`, borderRadius: 8, fontSize: 13, outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'Segoe UI, sans-serif', color: C.text }} />
                   <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
                     <button onClick={() => { if (rejectReason.trim()) onReject(bill.id, rejectReason); }} disabled={!rejectReason.trim()} style={{ ...btnDanger, opacity: rejectReason.trim() ? 1 : 0.45 }}>Confirm Rejection</button>
                     <button onClick={() => setRejectMode(false)} style={btnSecondary}>Cancel</button>
@@ -757,14 +927,15 @@ function AuditLog({ log }) {
 }
 
 function Reports({ bills }) {
-  const approved = bills.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status));
+  const PAID_STATUSES = ['aao_approved','ao_approved','loc_processing','f53_posted','paid'];
+  const approved = bills.filter(b => PAID_STATUSES.includes(b.status));
   const totalAmt = approved.reduce((s, b) => s + b.grandTotal, 0);
   const avgAmt = bills.length ? Math.round(bills.reduce((s, b) => s + b.grandTotal, 0) / bills.length) : 0;
   const approvalRate = bills.length ? Math.round(approved.length / bills.length * 100) : 0;
 
-  const employeeStats = USERS.filter(u => [ROLES.EMPLOYEE, ROLES.SUPERVISOR].includes(u.role)).map(u => {
+  const employeeStats = USERS.filter(u => u.role === ROLES.EMPLOYEE).map(u => {
     const eb = bills.filter(b => b.employeeId === u.id);
-    return { name: u.name, designation: u.designation, total: eb.length, approved: eb.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status)).length, rejected: eb.filter(b => b.status === 'rejected').length, amount: eb.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status)).reduce((s, b) => s + b.grandTotal, 0) };
+    return { name: u.name, designation: u.designation, total: eb.length, approved: eb.filter(b => PAID_STATUSES.includes(b.status)).length, rejected: eb.filter(b => b.status === 'rejected').length, amount: eb.filter(b => PAID_STATUSES.includes(b.status)).reduce((s, b) => s + b.grandTotal, 0) };
   });
 
   return (
@@ -863,284 +1034,390 @@ function UserManagement() {
 
 function FinancePaymentForm({ bill, onPost, onPark, onClose }) {
   const [tab, setTab] = useState(0);
+  const [simulated, setSimulated] = useState(false);
   const today = new Date().toISOString().split('T')[0];
 
   const [hdr, setHdr] = useState({
-    supplier: bill.employeeName,
-    supplierCode: bill.empId,
-    sglInd: false,
+    supplierEmpId: bill.empId,
     invoiceDate: today,
-    reference: bill.billNo,
+    inwardNo: bill.inwardNo || '',
     postingDate: today,
     amount: bill.grandTotal,
-    busPlaceSectn: '1000',
-    text: `TA Bill ${bill.month} ${bill.year} - ${bill.employeeName}`,
-    investId: false,
+    text: `TA Bill For the Month of ${bill.month} ${bill.year}`,
+    currency: 'INR',
   });
 
-  const [payment, setPayment] = useState({
-    paymentMethod: 'NEFT',
-    bankAccount: '',
-    businessArea: 'STo',
+  const [lineItem, setLineItem] = useState({
+    glAc: '76132',
+    amount: bill.grandTotal,
+    taxCode: 'V0',
+    text: `TA Bill For the Month of ${bill.month} ${bill.year}`,
+    businessArea: '',
     costCenter: '',
-    paymentTerms: 'Immediate',
+    qty: '1',
+    baseUOM: 'MON',
+    hsnCode: 'ZN0001',
   });
 
-  const [details, setDetails] = useState({
-    org: bill.org || '',
-    rvo: '',
-    parameter: '',
-    location: bill.hq || '',
-    pUnit: '',
+  const [baTab, setBaTab] = useState({
+    businessArea: '',
+    paymentTerm: 'LC5T',
+    headerText: `TA Bill For the Month of ${bill.month} ${bill.year}`,
   });
-
 
   const L = { fontSize: 12, fontWeight: 600, color: C.textSec, marginBottom: 4, display: 'block' };
   const I = { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', color: C.text, background: '#fff', width: '100%', boxSizing: 'border-box' };
   const IR = { ...I, background: C.bg, color: C.textMuted };
-  const TABS = ['Basic Data', 'Payment', 'Details', 'Tax'];
+  const TABS = ['Basic Details', 'Line Item', 'Business Area', 'Tax'];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', fontFamily: 'Segoe UI, sans-serif' }}>
+      <div style={{ background: '#1e3a8a', flexShrink: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>T-Code</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>FV-60 — TA Document Post</div>
+            </div>
+            <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.2)' }} />
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
+              Company Code: <strong style={{ color: '#fff' }}>3000</strong> · APTRANSCO VIJAYAWADA
+            </div>
+            {bill.passOrderNo && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>Pass Order: <strong style={{ color: '#fff' }}>{bill.passOrderNo}</strong></div>}
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', padding: '6px 10px', borderRadius: 6, color: '#fff', display: 'flex', alignItems: 'center' }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ display: 'flex', padding: '0 16px' }}>
+          {TABS.map((t, i) => (
+            <button key={t} onClick={() => setTab(i)} style={{ padding: '8px 18px', border: 'none', cursor: 'pointer', background: tab === i ? '#fff' : 'transparent', color: tab === i ? '#1e3a8a' : 'rgba(255,255,255,0.75)', fontWeight: tab === i ? 700 : 400, fontSize: 13, borderRadius: tab === i ? '6px 6px 0 0' : 0, fontFamily: 'Segoe UI, sans-serif' }}>
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* SAP-style header bar */}
-        <div style={{ background: '#1e3a8a', flexShrink: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px 80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: C.primaryLight, borderRadius: 8, border: `1px solid ${C.infoBorder}`, marginBottom: 20 }}>
+          <FileText size={18} color={C.primary} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{bill.billNo} · Emp ID: {bill.empId}</div>
+            <div style={{ fontSize: 12, color: C.textSec }}>{bill.employeeName} · {bill.designation} · {bill.month} {bill.year}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, color: C.textMuted }}>Pass Order Amount</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: C.success }}>{fmtAmt(bill.grandTotal)}</div>
+          </div>
+        </div>
+
+        {tab === 0 && (
+          <div style={card}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Header — Basic Details</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Transaction</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Invoice — FV60</div>
+                <label style={L}>Supplier (Employee ID)</label>
+                <input value={hdr.supplierEmpId} onChange={e => setHdr({ ...hdr, supplierEmpId: e.target.value })} style={{ ...I, fontWeight: 600 }} />
               </div>
-              <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.2)' }} />
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
-                Company Code: <strong style={{ color: '#fff' }}>3000</strong> APTRANSCO VIJAYAWADA
+              <div>
+                <label style={L}>Reference — Inward Number Entry</label>
+                <input value={hdr.inwardNo} onChange={e => setHdr({ ...hdr, inwardNo: e.target.value })} placeholder="e.g. IW/2024/0312" style={I} />
+              </div>
+              <div>
+                <label style={L}>Invoice Date (Date of Document Entry)</label>
+                <input type="date" value={hdr.invoiceDate} onChange={e => setHdr({ ...hdr, invoiceDate: e.target.value })} style={I} />
+              </div>
+              <div>
+                <label style={L}>Posting Date (System Date)</label>
+                <input type="date" value={hdr.postingDate} readOnly style={IR} />
               </div>
             </div>
-            <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', padding: '6px 10px', borderRadius: 6, color: '#fff', display: 'flex', alignItems: 'center' }}>
-              <X size={16} />
-            </button>
-          </div>
-          <div style={{ display: 'flex', padding: '0 16px' }}>
-            {TABS.map((t, i) => (
-              <button key={t} onClick={() => setTab(i)} style={{ padding: '8px 18px', border: 'none', cursor: 'pointer', background: tab === i ? '#fff' : 'transparent', color: tab === i ? '#1e3a8a' : 'rgba(255,255,255,0.75)', fontWeight: tab === i ? 700 : 400, fontSize: 13, borderRadius: tab === i ? '6px 6px 0 0' : 0, fontFamily: 'Segoe UI, sans-serif' }}>
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Scrollable content */}
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px 64px' }}>
-
-          {/* Bill context banner */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: C.primaryLight, borderRadius: 8, border: `1px solid ${C.infoBorder}`, marginBottom: 20 }}>
-            <FileText size={18} color={C.primary} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{bill.billNo}</div>
-              <div style={{ fontSize: 12, color: C.textSec }}>{bill.employeeName} · {bill.designation} · {bill.month} {bill.year}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: 14, marginBottom: 14, alignItems: 'end' }}>
+              <div>
+                <label style={L}>Amount (Employee Amount)</label>
+                <input type="number" value={hdr.amount} onChange={e => setHdr({ ...hdr, amount: +e.target.value, })} style={{ ...I, fontWeight: 700 }} />
+              </div>
+              <div>
+                <label style={L}>Currency</label>
+                <input value="INR" readOnly style={IR} />
+              </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 11, color: C.textMuted }}>Approved Amount</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.success }}>{fmtAmt(bill.grandTotal)}</div>
-            </div>
-          </div>
-
-          {/* ── Tab 0: Basic Data ── */}
-          {tab === 0 && (
             <div>
-              <div style={{ ...card, marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Header Data</div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 14 }}>
-                  <div>
-                    <label style={L}>Employee ID</label>
-                    <input type="number" value={hdr.supplier} onChange={e => { if (e.target.value.length <= 5) setHdr({ ...hdr, supplier: e.target.value }); }} min="10000" max="99999" style={I} />
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <label style={L}>SGL Ind</label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 6, cursor: 'pointer' }}>
-                      <input type="checkbox" checked={hdr.sglInd} onChange={e => setHdr({ ...hdr, sglInd: e.target.checked })} style={{ width: 15, height: 15, accentColor: C.primary }} />
-                      <span style={{ fontSize: 13, color: C.textSec }}>Special G/L Indicator</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
-                  <div>
-                    <label style={L}>Invoice Date</label>
-                    <input type="date" value={hdr.invoiceDate} onChange={e => setHdr({ ...hdr, invoiceDate: e.target.value })} style={I} />
-                  </div>
-                  <div>
-                    <label style={L}>Reference</label>
-                    <input value={hdr.reference} onChange={e => setHdr({ ...hdr, reference: e.target.value })} style={I} />
-                  </div>
-                  <div>
-                    <label style={L}>Posting Date</label>
-                    <input type="date" value={hdr.postingDate} onChange={e => setHdr({ ...hdr, postingDate: e.target.value })} style={I} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: 14, marginBottom: 14, alignItems: 'end' }}>
-                  <div>
-                    <label style={L}>Amount</label>
-                    <input type="number" value={hdr.amount} onChange={e => setHdr({ ...hdr, amount: e.target.value })} style={{ ...I, fontWeight: 700 }} />
-                  </div>
-                  <div>
-                    <label style={L}>Currency</label>
-                    <input value="INR" readOnly style={IR} />
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: 14 }}>
-                  <label style={L}>Bus. Place / Sectn</label>
-                  <input value={hdr.busPlaceSectn} onChange={e => setHdr({ ...hdr, busPlaceSectn: e.target.value })} style={I} />
-                </div>
-
-                <div style={{ marginBottom: 12 }}>
-                  <label style={L}>Remarks</label>
-                  <input value={hdr.text} onChange={e => setHdr({ ...hdr, text: e.target.value })} style={I} />
-                </div>
-
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                  <input type="checkbox" checked={hdr.investId} onChange={e => setHdr({ ...hdr, investId: e.target.checked })} style={{ width: 14, height: 14, accentColor: C.primary }} />
-                  <span style={{ fontSize: 12, color: C.textSec }}>Invest ID</span>
-                </label>
-              </div>
-
+              <label style={L}>Text (Remarks)</label>
+              <input value={hdr.text} onChange={e => setHdr({ ...hdr, text: e.target.value })} style={I} />
             </div>
-          )}
-
-          {/* ── Tab 1: Payment ── */}
-          {tab === 1 && (
-            <div>
-              <div style={{ ...card, marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Payment Details</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <div>
-                    <label style={L}>Payment Method</label>
-                    <select value={payment.paymentMethod} onChange={e => setPayment({ ...payment, paymentMethod: e.target.value })} style={{ ...I, cursor: 'pointer' }}>
-                      {['NEFT', 'RTGS', 'Cheque', 'DD', 'Cash'].map(m => <option key={m}>{m}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={L}>Bank Account / Beneficiary No.</label>
-                    <input value={payment.bankAccount} onChange={e => setPayment({ ...payment, bankAccount: e.target.value })} placeholder="Account number" style={I} />
-                  </div>
-                  <div>
-                    <label style={L}>Business Area</label>
-                    <input value={payment.businessArea} onChange={e => setPayment({ ...payment, businessArea: e.target.value })} placeholder="e.g. STo" style={I} />
-                  </div>
-                  <div>
-                    <label style={L}>Cost Center / H/L Code</label>
-                    <input value={payment.costCenter} onChange={e => setPayment({ ...payment, costCenter: e.target.value })} placeholder="e.g. CC1000" style={I} />
-                  </div>
-                  <div>
-                    <label style={L}>Payment Terms</label>
-                    <input value={payment.paymentTerms} onChange={e => setPayment({ ...payment, paymentTerms: e.target.value })} style={I} />
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* ── Tab 2: Details ── */}
-          {tab === 2 && (
-            <div style={card}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Organisational Details</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                {[
-                  { l: 'Organisation',              f: 'org',       ph: 'e.g. SE/O&M/VIZIANAGARAM' },
-                  { l: 'RVO (Revenue Divn. Office)', f: 'rvo',       ph: '' },
-                  { l: 'Parameter',                  f: 'parameter', ph: '' },
-                  { l: 'Location',                   f: 'location',  ph: '' },
-                  { l: 'P. Unit (Payment Unit)',      f: 'pUnit',     ph: '' },
-                ].map(({ l, f, ph }) => (
-                  <div key={f}>
-                    <label style={L}>{l}</label>
-                    <input value={details[f]} onChange={e => setDetails({ ...details, [f]: e.target.value })} placeholder={ph} style={I} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── Tab 3: Tax ── */}
-          {tab === 3 && (
-            <div style={card}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Tax Information</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div>
-                  <label style={L}>Tax Jurisdiction Code</label>
-                  <input placeholder="e.g. AP" style={I} />
-                </div>
-                <div>
-                  <label style={L}>Document Currency</label>
-                  <input value="INR" readOnly style={IR} />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sticky footer */}
-        <div style={{ position: 'fixed', bottom: 0, left: 256, right: 0, padding: '14px 24px', borderTop: `2px solid ${C.border}`, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', background: '#fff', zIndex: 10 }}>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={onClose} style={btnSecondary}>Cancel</button>
-            <button onClick={() => onPark({ hdr, payment, details })} style={btn(C.warningBg, C.warning, C.warningBorder)}>
-              <Clock size={14} /> Park Document
-            </button>
-            <button onClick={() => onPost({ hdr, payment, details })} style={btnPrimary}>
-              <CheckCircle size={14} /> Post Invoice
-            </button>
           </div>
+        )}
+
+        {tab === 1 && (
+          <div style={card}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Line Item</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+              <div>
+                <label style={L}>GL A/C</label>
+                <input value={lineItem.glAc} readOnly style={{ ...IR, fontWeight: 700 }} />
+              </div>
+              <div>
+                <label style={L}>Amount (same as Basic Details)</label>
+                <input type="number" value={hdr.amount} readOnly style={{ ...IR, fontWeight: 700 }} />
+              </div>
+              <div>
+                <label style={L}>Tax Code</label>
+                <input value={lineItem.taxCode} readOnly style={{ ...IR, fontWeight: 600 }} />
+              </div>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={L}>Text (same as Basic Details)</label>
+              <input value={hdr.text} readOnly style={IR} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+              <div>
+                <label style={L}>Business Area (Employee Business Area — Auto)</label>
+                <input value={lineItem.businessArea} onChange={e => setLineItem({ ...lineItem, businessArea: e.target.value })} placeholder="Auto-fetched from Employee" style={I} />
+              </div>
+              <div>
+                <label style={L}>Cost Centre (Employee Cost Centre — Auto)</label>
+                <input value={lineItem.costCenter} onChange={e => setLineItem({ ...lineItem, costCenter: e.target.value })} placeholder="Auto-fetched from Employee" style={I} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+              <div>
+                <label style={L}>Qty</label>
+                <input value={lineItem.qty} readOnly style={IR} />
+              </div>
+              <div>
+                <label style={L}>Base on Measurement</label>
+                <input value={lineItem.baseUOM} readOnly style={IR} />
+              </div>
+              <div>
+                <label style={L}>HSN Code</label>
+                <input value={lineItem.hsnCode} readOnly style={IR} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 2 && (
+          <div style={card}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Business Area Tab</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div>
+                <label style={L}>Employee Business Area</label>
+                <input value={baTab.businessArea} onChange={e => setBaTab({ ...baTab, businessArea: e.target.value })} placeholder="e.g. 1000" style={I} />
+              </div>
+              <div>
+                <label style={L}>Payment Term</label>
+                <input value={baTab.paymentTerm} readOnly style={{ ...IR, fontWeight: 700 }} />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={L}>Header Text</label>
+                <input value={baTab.headerText} onChange={e => setBaTab({ ...baTab, headerText: e.target.value })} style={{ ...I, fontWeight: 600 }} />
+              </div>
+            </div>
+            <div style={{ marginTop: 16, padding: '10px 14px', background: C.primaryLight, borderRadius: 8, border: `1px solid ${C.infoBorder}` }}>
+              <div style={{ fontSize: 12, color: C.textSec }}><strong>Next step after posting:</strong> Document will appear in Cash Section (JAO → AAO/AO → LOC → F-53)</div>
+            </div>
+          </div>
+        )}
+
+        {tab === 3 && (
+          <div style={card}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Tax</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div><label style={L}>Tax Code</label><input value="V0" readOnly style={IR} /></div>
+              <div><label style={L}>Document Currency</label><input value="INR" readOnly style={IR} /></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ position: 'fixed', bottom: 0, left: 256, right: 0, padding: '14px 24px', borderTop: `2px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', zIndex: 10 }}>
+        <div style={{ fontSize: 12, color: C.textMuted }}>
+          {simulated && <span style={{ color: C.success, fontWeight: 600 }}>✓ Simulation successful — ready to post</span>}
         </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onClose} style={btnSecondary}>Cancel</button>
+          <button onClick={() => setSimulated(true)} style={btn(C.infoBg, C.info, C.infoBorder)}>
+            <Activity size={14} /> Simulate
+          </button>
+          <button onClick={() => onPark({ hdr, lineItem, baTab })} style={btn(C.warningBg, C.warning, C.warningBorder)}>
+            <Clock size={14} /> Park Document
+          </button>
+          <button onClick={() => onPost({ hdr, lineItem, baTab })} disabled={!simulated} style={{ ...btnPrimary, opacity: simulated ? 1 : 0.5 }}>
+            <CheckCircle size={14} /> Post Document → LOC Section
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-function FinanceProcessPage({ bills, onProcess }) {
+function F53Form({ bill, onPost, onClose }) {
+  const today = new Date().toISOString().split('T')[0];
+  const [form, setForm] = useState({
+    docType: 'KZ',
+    companyCode: '3000',
+    postingDate: today,
+    docDate: today,
+    vendorId: bill.empId,
+    sapDocNo: bill.sapDocNo || '',
+    fiscalYear: new Date().getFullYear().toString(),
+    paymentMethod: 'NEFT',
+    bankKey: 'SBI',
+    bankAccount: '',
+    amount: bill.grandTotal,
+    text: `TA Bill ${bill.month} ${bill.year} - ${bill.employeeName}`,
+  });
+  const f = form;
+  const L = { fontSize: 12, fontWeight: 600, color: C.textSec, marginBottom: 4, display: 'block' };
+  const I = { padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', color: C.text, background: '#fff', width: '100%', boxSizing: 'border-box' };
+  const IR = { ...I, background: C.bg, color: C.textMuted };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', fontFamily: 'Segoe UI, sans-serif' }}>
+      <div style={{ background: '#064e3b', flexShrink: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>T-Code</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>F-53 — Post Outgoing Payment</div>
+            </div>
+            <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.2)' }} />
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>Posting against Document · JAO (Cash)</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', padding: '6px 10px', borderRadius: 6, color: '#fff', display: 'flex', alignItems: 'center' }}>
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px 80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px', background: '#ECFDF5', borderRadius: 8, border: '1px solid #6EE7B7', marginBottom: 20 }}>
+          <IndianRupee size={18} color="#065F46" />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{bill.billNo} · FV-60 Doc: {bill.sapDocNo || '—'}</div>
+            <div style={{ fontSize: 12, color: C.textSec }}>{bill.employeeName} · {bill.designation} · {bill.month} {bill.year}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, color: C.textMuted }}>Payment Amount</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#065F46' }}>{fmtAmt(bill.grandTotal)}</div>
+          </div>
+        </div>
+
+        <div style={{ ...card, marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Document Header</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div><label style={L}>Document Type</label><input value={f.docType} readOnly style={IR} /></div>
+            <div><label style={L}>Company Code</label><input value={f.companyCode} readOnly style={IR} /></div>
+            <div><label style={L}>Posting Date</label><input type="date" value={f.postingDate} onChange={e => setForm({ ...f, postingDate: e.target.value })} style={I} /></div>
+            <div><label style={L}>Document Date</label><input type="date" value={f.docDate} onChange={e => setForm({ ...f, docDate: e.target.value })} style={I} /></div>
+            <div><label style={L}>Vendor / Employee ID</label><input value={f.vendorId} readOnly style={{ ...IR, fontWeight: 700 }} /></div>
+            <div><label style={L}>SAP Document No. (FV-60)</label><input value={f.sapDocNo} onChange={e => setForm({ ...f, sapDocNo: e.target.value })} placeholder="e.g. 5100001234" style={I} /></div>
+          </div>
+        </div>
+
+        <div style={{ ...card, marginBottom: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Payment Details</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div>
+              <label style={L}>Payment Method</label>
+              <select value={f.paymentMethod} onChange={e => setForm({ ...f, paymentMethod: e.target.value })} style={{ ...I, cursor: 'pointer' }}>
+                {['NEFT', 'RTGS', 'Cheque (LOC)', 'B&R', 'DD'].map(m => <option key={m}>{m}</option>)}
+              </select>
+            </div>
+            <div><label style={L}>Bank Key</label><input value={f.bankKey} onChange={e => setForm({ ...f, bankKey: e.target.value })} style={I} /></div>
+            <div><label style={L}>Bank Account (Beneficiary)</label><input value={f.bankAccount} onChange={e => setForm({ ...f, bankAccount: e.target.value })} placeholder="Account number" style={I} /></div>
+            <div>
+              <label style={L}>Amount</label>
+              <input type="number" value={f.amount} onChange={e => setForm({ ...f, amount: +e.target.value })} style={{ ...I, fontWeight: 700 }} />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={L}>Text</label>
+              <input value={f.text} onChange={e => setForm({ ...f, text: e.target.value })} style={I} />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: '12px 16px', background: '#ECFDF5', borderRadius: 8, border: '1px solid #6EE7B7', fontSize: 13, color: '#065F46' }}>
+          <strong>Offline Process:</strong> LOC / B&R Check to Bank will be processed after F-53 posting. Payment is confirmed upon document posting.
+        </div>
+      </div>
+
+      <div style={{ position: 'fixed', bottom: 0, left: 256, right: 0, padding: '14px 24px', borderTop: `2px solid ${C.border}`, display: 'flex', justifyContent: 'flex-end', gap: 10, background: '#fff', zIndex: 10 }}>
+        <button onClick={onClose} style={btnSecondary}>Cancel</button>
+        <button onClick={() => onPost(form)} style={{ ...btn('#ECFDF5', '#065F46', '#6EE7B7'), fontWeight: 700 }}>
+          <CheckCircle size={15} /> Post Payment (F-53) — Confirm Payment
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TeamDirectory() {
+  const contacts = USERS.filter(u => u.phone || [ROLES.JAO_BILLS, ROLES.JAO_CASH, ROLES.AAO_CASH, ROLES.AO_CASH, ROLES.PAY_OFFICER, ROLES.FINANCE].includes(u.role));
+  const ROLE_COLORS = {
+    [ROLES.JAO_BILLS]: { bg: C.infoBg, c: C.info }, [ROLES.JAO_CASH]: { bg: '#ECFDF5', c: '#065F46' },
+    [ROLES.AAO_CASH]: { bg: C.successBg, c: C.success }, [ROLES.AO_CASH]: { bg: '#FEF3C7', c: '#92400E' },
+    [ROLES.PAY_OFFICER]: { bg: '#F3E8FF', c: '#7C3AED' }, [ROLES.FINANCE]: { bg: C.primaryLight, c: C.primary },
+    [ROLES.ADMIN]: { bg: C.dangerBg, c: C.danger }, [ROLES.EMPLOYEE]: { bg: C.borderLight, c: C.textSec },
+  };
+  return (
+    <div style={{ fontFamily: 'Segoe UI, sans-serif' }}>
+      <div style={{ marginBottom: 16, padding: '12px 16px', background: C.primaryLight, borderRadius: 8, border: `1px solid ${C.infoBorder}`, fontSize: 13, color: C.textSec }}>
+        <strong>TA Bill Process Hierarchy:</strong> CGM(Finance) → GM(Finance) → Pay Officer → AO → CPR → AAO(Other Bills) → JAO(Cash) → AAO(Cash) → AO(Cash)
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        {contacts.map(u => {
+          const rc = ROLE_COLORS[u.role] || { bg: C.borderLight, c: C.textSec };
+          return (
+            <div key={u.id} style={{ ...card, display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Avatar text={u.av} size={44} bg={rc.bg} color={rc.c} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{u.name}</div>
+                <div style={{ fontSize: 12, color: C.textSec, margin: '2px 0' }}>{u.designation}</div>
+                {u.phone && <div style={{ fontSize: 12, color: C.primary, fontWeight: 600 }}>{u.phone}</div>}
+                <span style={{ background: rc.bg, color: rc.c, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, letterSpacing: '0.04em' }}>{ROLE_LABELS[u.role]?.split(' — ')[0] || u.role}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FinanceProcessPage({ bills }) {
   const [q, setQ] = useState('');
   const [sf, setSf] = useState('all');
 
-  const sfStatusMap = { approved: ['forwarded_ro', 'forwarded_rvo', 'payment_processing'], loc_processing: ['loc_processing'], paid: ['paid'] };
-  const eligible = bills.filter(b => ['forwarded_ro', 'forwarded_rvo', 'payment_processing', 'loc_processing', 'paid'].includes(b.status));
+  const allStages = ['submitted','scrutiny','pass_order','fv60_posted','cash_pending','aao_approved','ao_approved','loc_processing','f53_posted','paid','rejected'];
+  const eligible = bills.filter(b => allStages.includes(b.status));
   const filtered = eligible.filter(b =>
     (q === '' || b.billNo.toLowerCase().includes(q.toLowerCase()) || b.employeeName.toLowerCase().includes(q.toLowerCase())) &&
-    (sf === 'all' || (sfStatusMap[sf] || [sf]).includes(b.status))
+    (sf === 'all' || b.status === sf)
   );
 
-  const readyCount    = bills.filter(b => ['forwarded_ro', 'forwarded_rvo', 'payment_processing'].includes(b.status)).length;
-  const processingCnt = bills.filter(b => b.status === 'loc_processing').length;
-  const paidCount     = bills.filter(b => b.status === 'paid').length;
-  const paidAmt       = bills.filter(b => b.status === 'paid').reduce((s, b) => s + b.grandTotal, 0);
+  const stageCount = key => bills.filter(b => b.status === key).length;
+  const metrics = [
+    { label: 'New Bills (Scrutiny)', val: stageCount('submitted') + stageCount('scrutiny'), c: C.warning, bg: C.warningBg, Icon: Inbox },
+    { label: 'FV-60 Pending', val: stageCount('pass_order'), c: '#7C3AED', bg: '#F3E8FF', Icon: Activity },
+    { label: 'LOC Processing', val: stageCount('loc_processing') + stageCount('cash_pending'), c: '#0E7490', bg: '#CFFAFE', Icon: Hourglass },
+    { label: 'Paid (F-53)', val: fmtAmt(bills.filter(b => ['f53_posted','paid'].includes(b.status)).reduce((s, b) => s + b.grandTotal, 0)), c: '#065F46', bg: '#D1FAE5', Icon: IndianRupee },
+  ];
 
   const TH = { fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: 'left', background: C.bg, borderBottom: `1px solid ${C.border}` };
   const TD = { padding: '12px 14px', fontSize: 13, color: C.text, borderBottom: `1px solid ${C.borderLight}`, verticalAlign: 'middle' };
 
   return (
     <div style={{ fontFamily: 'Segoe UI, sans-serif' }}>
-      <p style={{ color: C.textSec, margin: '0 0 20px' }}>Review approved TA bills and post vendor invoices to process employee payments.</p>
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
-        {[
-          { label: 'Bills Received',        val: readyCount,       c: C.warning,  bg: C.warningBg,  Icon: Clock },
-          { label: 'LOC Processing',        val: processingCnt,    c: '#7C3AED',  bg: '#F3E8FF',    Icon: Activity },
-          { label: 'Payment Under Review',  val: paidCount,        c: C.warning,  bg: C.warningBg,  Icon: Hourglass },
-          { label: 'Paid',                  val: fmtAmt(paidAmt),  c: '#065F46',  bg: '#D1FAE5',    Icon: IndianRupee },
-        ].map((m, i) => (
+        {metrics.map((m, i) => (
           <div key={i} style={{ ...card, display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: m.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <m.Icon size={20} color={m.c} />
-            </div>
-            <div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: C.text }}>{m.val}</div>
-              <div style={{ fontSize: 12, color: C.textSec }}>{m.label}</div>
-            </div>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: m.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><m.Icon size={20} color={m.c} /></div>
+            <div><div style={{ fontSize: 22, fontWeight: 700, color: C.text }}>{m.val}</div><div style={{ fontSize: 12, color: C.textSec }}>{m.label}</div></div>
           </div>
         ))}
       </div>
-
       <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
         <div style={{ position: 'relative', flex: 1 }}>
           <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: C.textMuted }} />
@@ -1148,47 +1425,28 @@ function FinanceProcessPage({ bills, onProcess }) {
         </div>
         <select value={sf} onChange={e => setSf(e.target.value)} style={{ padding: '9px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', cursor: 'pointer', color: C.text, background: '#fff' }}>
           <option value="all">All Stages</option>
-          <option value="approved">Pass Order</option>
-          <option value="loc_processing">LOC</option>
-          <option value="paid">Paid</option>
+          {Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
         </select>
       </div>
-
       <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {['Bill No.', 'Employee', 'Period', 'Amount', 'Approved By', 'Approved On', 'Status', 'Action'].map(h => <th key={h} style={TH}>{h}</th>)}
-            </tr>
-          </thead>
+          <thead><tr>{['Bill No.', 'Employee', 'Period', 'Amount', 'Pass Order / SAP Doc', 'Status'].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
           <tbody>
             {filtered.length === 0
-              ? <tr><td colSpan={8} style={{ ...TD, textAlign: 'center', padding: 48, color: C.textMuted }}>No bills at this stage.</td></tr>
+              ? <tr><td colSpan={6} style={{ ...TD, textAlign: 'center', padding: 48, color: C.textMuted }}>No bills at this stage.</td></tr>
               : filtered.map(b => (
                 <tr key={b.id}>
                   <td style={TD}><span style={{ fontWeight: 600, color: C.primary }}>{b.billNo}</span></td>
-                  <td style={TD}><div style={{ fontWeight: 500 }}>{b.employeeName}</div><div style={{ fontSize: 11, color: C.textMuted }}>{b.designation}</div></td>
+                  <td style={TD}><div style={{ fontWeight: 500 }}>{b.employeeName}</div><div style={{ fontSize: 11, color: C.textMuted }}>{b.designation} · {b.grandTotal < 50000 ? 'AAO limit' : 'AO limit'}</div></td>
                   <td style={TD}>{b.month} {b.year}</td>
                   <td style={{ ...TD, fontWeight: 700 }}>{fmtAmt(b.grandTotal)}</td>
-                  <td style={TD}>{USERS.find(u => u.id === b.approvedBy)?.name || '—'}</td>
-                  <td style={{ ...TD, color: C.textMuted }}>{fmtDate(b.approvedAt)}</td>
-                  <td style={TD}><Badge status={b.status} /></td>
                   <td style={TD}>
-                    {b.status === 'paid'
-                      ? <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#065F46' }}>✓ Posted</div>
-                          {b.paymentRef && <div style={{ fontSize: 11, color: C.textMuted }}>Ref: {b.paymentRef}</div>}
-                        </div>
-                      : b.status === 'loc_processing'
-                      ? <div>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>✓ LOC Posted</div>
-                          {b.paymentRef && <div style={{ fontSize: 11, color: C.textMuted }}>Ref: {b.paymentRef}</div>}
-                        </div>
-                      : <button onClick={() => onProcess(b)} style={{ ...btnPrimary, padding: '6px 14px', fontSize: 12 }}>
-                          <IndianRupee size={13} /> {b.status === 'payment_processing' ? 'Resume' : 'Process'}
-                        </button>
-                    }
+                    {b.passOrderNo && <div style={{ fontSize: 12 }}><span style={{ color: C.textMuted }}>PO: </span><strong>{b.passOrderNo}</strong></div>}
+                    {b.sapDocNo    && <div style={{ fontSize: 12 }}><span style={{ color: C.textMuted }}>SAP: </span><strong>{b.sapDocNo}</strong></div>}
+                    {b.paymentRef  && <div style={{ fontSize: 12 }}><span style={{ color: C.textMuted }}>F-53: </span><strong>{b.paymentRef}</strong></div>}
+                    {!b.passOrderNo && !b.sapDocNo && !b.paymentRef && <span style={{ color: C.textMuted }}>—</span>}
                   </td>
+                  <td style={TD}><Badge status={b.status} /></td>
                 </tr>
               ))
             }
@@ -1203,13 +1461,15 @@ function FinanceProcessPage({ bills, onProcess }) {
 function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
   const [page, setPage] = useState('dashboard');
   const [selected, setSelected] = useState(null);
-  const [financeTarget, setFinanceTarget] = useState(null);
+  const [fv60Target, setFv60Target] = useState(null);
+  const [f53Target, setF53Target] = useState(null);
 
-  const pending = bills.filter(b => ['submitted', 'under_review'].includes(b.status));
+  const pending = bills.filter(b => ['submitted','scrutiny','pass_order','fv60_posted','cash_pending','loc_processing'].includes(b.status));
 
-  const addAudit = (action, billId, billNo, details) => {
+  const addAudit = (action, billId, billNo, details) =>
     setAuditLog(prev => [{ id: 'A' + Date.now(), billId, billNo, action, userId: user.id, userName: user.name, ts: new Date().toISOString(), details }, ...prev]);
-  };
+
+  const updateBill = (billId, patch) => setBills(prev => prev.map(b => b.id === billId ? { ...b, ...patch } : b));
 
   const handleSubmitBill = (data) => {
     const id = 'B' + Date.now();
@@ -1224,81 +1484,122 @@ function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
       reviewedBy: null, reviewedAt: null, approvedBy: null, approvedAt: null, remarks: '',
     };
     setBills(prev => [newBill, ...prev]);
-    addAudit('submitted', id, billNo, `Bill submitted for approval. Grand Total: ${fmtAmt(data.totals.grand)}`);
+    addAudit('submitted', id, billNo, `Bill submitted. Grand Total: ${fmtAmt(data.totals.grand)}`);
     setPage('mybills');
   };
 
   const handleView = (bill) => {
-    setSelected(bill);
+    const latest = bills.find(b => b.id === bill.id) || bill;
+    setSelected(latest);
     addAudit('viewed', bill.id, bill.billNo, `Bill viewed by ${user.name}`);
-    if ([ROLES.SUPERVISOR, ROLES.ADMIN].includes(user.role) && bill.status === 'submitted') {
-      setBills(prev => prev.map(b => b.id === bill.id ? { ...b, status: 'under_review', reviewedBy: user.id, reviewedAt: new Date().toISOString() } : b));
-      addAudit('reviewed', bill.id, bill.billNo, `Bill opened for review — status changed to Under Review`);
-    }
   };
 
-  const handleApprove = (billId, remarks) => {
-    setBills(prev => prev.map(b => b.id === billId ? { ...b, status: 'forwarded_ro', approvedBy: user.id, approvedAt: new Date().toISOString(), remarks } : b));
+  const handlePassOrder = (billId, newStatus, inwardNo, passOrderNo) => {
+    updateBill(billId, { status: newStatus, inwardNo, passOrderNo, reviewedBy: user.id, reviewedAt: new Date().toISOString() });
     const b = bills.find(bb => bb.id === billId);
-    if (b) addAudit('approved', billId, b.billNo, `Bill approved by ${user.name}. Remarks: ${remarks}`);
+    if (b) addAudit(newStatus, billId, b.billNo, newStatus === 'scrutiny' ? `Bill received for scrutiny. Inward No: ${inwardNo}` : `Pass Order created: ${passOrderNo}`);
+    setSelected(null);
+  };
+
+  const handleFV60Open = (bill) => { setFv60Target(bill); setPage('finance_payment'); setSelected(null); };
+
+  const handleFV60Park = (billId, formData) => {
+    updateBill(billId, { status: 'pass_order', fv60Data: formData });
+    const b = bills.find(bb => bb.id === billId);
+    if (b) addAudit('fv60_parked', billId, b.billNo, `FV-60 parked by ${user.name}`);
+    setFv60Target(null); setPage('fv60');
+  };
+
+  const handleFV60Post = (billId, formData) => {
+    const sapDocNo = `SAP${Date.now().toString().slice(-10)}`;
+    updateBill(billId, { status: 'fv60_posted', sapDocNo, fv60PostedAt: new Date().toISOString(), fv60Data: formData });
+    const b = bills.find(bb => bb.id === billId);
+    if (b) addAudit('fv60_posted', billId, b.billNo, `FV-60 posted by ${user.name}. SAP Doc: ${sapDocNo}. Amount: ${fmtAmt(formData.hdr.amount)}`);
+    setFv60Target(null); setPage('fv60');
+  };
+
+  const handleCashReceive = (billId) => {
+    updateBill(billId, { status: 'cash_pending', cashReceivedBy: user.id, cashReceivedAt: new Date().toISOString() });
+    const b = bills.find(bb => bb.id === billId);
+    if (b) addAudit('cash_received', billId, b.billNo, `Cash section received bill. JAO: ${user.name}`);
+    setSelected(null);
+  };
+
+  const handleLOC = (billId) => {
+    updateBill(billId, { status: 'loc_processing', locInitiatedBy: user.id, locInitiatedAt: new Date().toISOString() });
+    const b = bills.find(bb => bb.id === billId);
+    if (b) addAudit('loc_initiated', billId, b.billNo, `LOC initiated by JAO Cash: ${user.name}`);
+    setSelected(null);
+  };
+
+  const handleCashApprove = (billId, newStatus) => {
+    updateBill(billId, { status: newStatus, approvedBy: user.id, approvedAt: new Date().toISOString() });
+    const b = bills.find(bb => bb.id === billId);
+    if (b) addAudit(newStatus, billId, b.billNo, `Bill ${newStatus === 'aao_approved' ? 'approved by AAO' : 'approved by AO'} Cash: ${user.name}`);
     setSelected(null);
   };
 
   const handleReject = (billId, reason) => {
-    setBills(prev => prev.map(b => b.id === billId ? { ...b, status: 'rejected', approvedBy: user.id, approvedAt: new Date().toISOString(), remarks: reason } : b));
+    updateBill(billId, { status: 'rejected', approvedBy: user.id, approvedAt: new Date().toISOString(), remarks: reason });
     const b = bills.find(bb => bb.id === billId);
     if (b) addAudit('rejected', billId, b.billNo, `Bill rejected by ${user.name}. Reason: ${reason}`);
     setSelected(null);
   };
 
-  const handleParkPayment = (billId, formData) => {
-    setBills(prev => prev.map(b => b.id === billId ? { ...b, status: 'payment_processing', paymentData: formData } : b));
+  const handleF53Post = (billId, formData) => {
+    const paymentRef = `F53${Date.now().toString().slice(-8)}`;
+    updateBill(billId, { status: 'f53_posted', paymentRef, paymentDate: new Date().toISOString(), f53Data: formData });
     const b = bills.find(bb => bb.id === billId);
-    if (b) addAudit('payment_parked', billId, b.billNo, `Invoice parked (FV60) by ${user.name}. Ref: ${formData.hdr.reference}`);
-    setFinanceTarget(null);
-    setPage('finance');
+    if (b) addAudit('f53_posted', billId, b.billNo, `F-53 posted by JAO Cash: ${user.name}. Ref: ${paymentRef}. Amount: ${fmtAmt(formData.amount)}`);
+    setF53Target(null); setPage('f53');
   };
 
-  const handlePostPayment = (billId, formData) => {
-    const paymentRef = `DOC${Date.now().toString().slice(-8)}`;
-    setBills(prev => prev.map(b => b.id === billId
-      ? { ...b, status: 'loc_processing', paymentRef, paymentDate: new Date().toISOString(), paymentData: formData }
-      : b
-    ));
-    const b = bills.find(bb => bb.id === billId);
-    if (b) addAudit('paid', billId, b.billNo, `Invoice posted (FV60) by ${user.name}. Doc: ${paymentRef}. Amount: ${fmtAmt(formData.hdr.amount)}`);
-    setFinanceTarget(null);
-    setPage('finance');
-  };
-
-  const myBills = bills.filter(b => b.employeeId === user.id);
-  const pendingApprovals = bills.filter(b => ['submitted', 'under_review'].includes(b.status));
+  const myBills        = bills.filter(b => b.employeeId === user.id);
+  const scrutinyQueue  = bills.filter(b => b.status === 'submitted');
+  const fv60Queue      = bills.filter(b => b.status === 'pass_order');
+  const cashQueue      = bills.filter(b => ['fv60_posted','cash_pending','aao_approved','ao_approved','loc_processing'].includes(b.status));
+  const f53Queue       = bills.filter(b => ['aao_approved','ao_approved'].includes(b.status));
+  const fullPage       = ['finance_payment','f53_form'].includes(page);
 
   const renderPage = () => {
     switch (page) {
-      case 'dashboard': return <Dashboard user={user} bills={bills} onNav={setPage} />;
-      case 'submit': return <SubmitBillPage user={user} onSubmit={handleSubmitBill} />;
-      case 'mybills': return <BillsTable bills={myBills} currentUser={user} onView={handleView} />;
-      case 'approvals': return <BillsTable bills={pendingApprovals} currentUser={user} onView={handleView} />;
-      case 'allbills': return <BillsTable bills={bills} currentUser={user} onView={handleView} />;
-      case 'finance': return <FinanceProcessPage bills={bills} onProcess={b => { setFinanceTarget(b); setPage('finance_payment'); }} />;
-      case 'finance_payment': return financeTarget ? <FinancePaymentForm bill={financeTarget} user={user} onPost={formData => handlePostPayment(financeTarget.id, formData)} onPark={formData => handleParkPayment(financeTarget.id, formData)} onClose={() => { setFinanceTarget(null); setPage('finance'); }} /> : null;
-      case 'reports': return <Reports bills={bills} />;
-      case 'auditlog': return <AuditLog log={auditLog} />;
-      case 'users': return <UserManagement />;
-      default: return <Dashboard user={user} bills={bills} onNav={setPage} />;
+      case 'dashboard':    return <Dashboard user={user} bills={bills} onNav={setPage} />;
+      case 'submit':       return <SubmitBillPage user={user} onSubmit={handleSubmitBill} />;
+      case 'mybills':      return <BillsTable bills={myBills} currentUser={user} onView={handleView} />;
+      case 'scrutiny':     return <BillsTable bills={scrutinyQueue} currentUser={user} onView={handleView} />;
+      case 'fv60':         return <BillsTable bills={fv60Queue} currentUser={user} onView={handleView} />;
+      case 'cash_queue':   return <BillsTable bills={cashQueue} currentUser={user} onView={handleView} />;
+      case 'f53':          return <BillsTable bills={f53Queue} currentUser={user} onView={b => { setF53Target(b); setPage('f53_form'); }} />;
+      case 'allbills':     return <BillsTable bills={bills} currentUser={user} onView={handleView} />;
+      case 'finance':      return <FinanceProcessPage bills={bills} />;
+      case 'finance_payment': return fv60Target ? <FinancePaymentForm bill={fv60Target} onPost={fd => handleFV60Post(fv60Target.id, fd)} onPark={fd => handleFV60Park(fv60Target.id, fd)} onClose={() => { setFv60Target(null); setPage('fv60'); }} /> : null;
+      case 'f53_form':     return f53Target ? <F53Form bill={f53Target} onPost={fd => handleF53Post(f53Target.id, fd)} onClose={() => { setF53Target(null); setPage('f53'); }} /> : null;
+      case 'reports':      return <Reports bills={bills} />;
+      case 'auditlog':     return <AuditLog log={auditLog} />;
+      case 'users':        return <UserManagement />;
+      case 'team':         return <TeamDirectory />;
+      default:             return <Dashboard user={user} bills={bills} onNav={setPage} />;
     }
   };
 
   return (
-    <div style={{ fontFamily: 'Segoe UI, sans-serif', ...(page === 'finance_payment' ? { height: '100vh', overflow: 'hidden' } : { minHeight: '100vh' }), background: C.bg }}>
+    <div style={{ fontFamily: 'Segoe UI, sans-serif', ...(fullPage ? { height: '100vh', overflow: 'hidden' } : { minHeight: '100vh' }), background: C.bg }}>
       <Sidebar user={user} page={page} onNav={setPage} onLogout={onLogout} />
       <TopBar user={user} page={page} onLogout={onLogout} pendingCount={pending.length} />
-      <main style={{ marginLeft: 256, marginTop: 60, padding: page === 'finance_payment' ? 0 : '24px 28px', ...(page === 'finance_payment' ? { height: 'calc(100vh - 60px)', overflow: 'hidden' } : { minHeight: 'calc(100vh - 60px)' }), background: C.bg }}>
+      <main style={{ marginLeft: 256, marginTop: 60, padding: fullPage ? 0 : '24px 28px', ...(fullPage ? { height: 'calc(100vh - 60px)', overflow: 'hidden' } : { minHeight: 'calc(100vh - 60px)' }), background: C.bg }}>
         {renderPage()}
       </main>
       {selected && (
-        <BillDetail bill={selected} currentUser={user} onClose={() => setSelected(null)} onApprove={handleApprove} onReject={handleReject} />
+        <BillDetail
+          bill={selected} currentUser={user}
+          onClose={() => setSelected(null)}
+          onPassOrder={handlePassOrder}
+          onFV60={handleFV60Open}
+          onCashReceive={handleCashReceive}
+          onLOC={handleLOC}
+          onCashApprove={handleCashApprove}
+          onReject={handleReject}
+        />
       )}
     </div>
   );
