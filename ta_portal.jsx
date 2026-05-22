@@ -3,7 +3,7 @@ import {
   LayoutDashboard, FileText, CheckCircle, XCircle, LogOut, Bell,
   Menu, Plus, Eye, Search, Activity, ChevronRight, AlertTriangle,
   ArrowLeft, X, User, Shield, Users, Download, Clock,
-  IndianRupee, BarChart3, Truck, MapPin, CheckSquare, Inbox
+  IndianRupee, BarChart3, Truck, MapPin, CheckSquare, Inbox, Hourglass
 } from "lucide-react";
 
 const C = {
@@ -58,7 +58,7 @@ const INIT_BILLS = [
       { id: 'J4', dateFrom: '2024-02-27', dateTo: '2024-02-27', fromLoc: 'Circle Office, Ongole', toLoc: 'VS, Vijayawada', purpose: 'Return journey', mode: 'Bus', distKm: 150, mileageAmt: 0, noDays: 0, daAmt: 0, railAmt: 0, roadConv: 0, total: 0, remarks: '' },
     ],
     totalMileage: 0, totalDA: 400, totalRailway: 760, totalRoad: 0, grandTotal: 1160,
-    certs: [true, true, true], status: 'approved',
+    certs: [true, true, true], status: 'forwarded_ro',
     submittedAt: '2024-03-01T09:15:00Z', reviewedBy: 'U002', reviewedAt: '2024-03-02T10:30:00Z',
     approvedBy: 'U002', approvedAt: '2024-03-02T11:00:00Z', remarks: 'Approved. All documents verified.',
   },
@@ -99,7 +99,7 @@ const INIT_BILLS = [
       { id: 'J9', dateFrom: '2024-03-22', dateTo: '2024-03-22', fromLoc: 'VS, Vijayawada', toLoc: 'Tirupati', purpose: 'Official coordination meeting — Grid expansion project', mode: 'Own Vehicle', distKm: 220, mileageAmt: 1760, noDays: 1, daAmt: 500, railAmt: 0, roadConv: 0, total: 2260, remarks: '' },
     ],
     totalMileage: 1760, totalDA: 500, totalRailway: 0, totalRoad: 0, grandTotal: 2260,
-    certs: [true, true, true], status: 'approved',
+    certs: [true, true, true], status: 'forwarded_rvo',
     submittedAt: '2024-04-05T11:00:00Z', reviewedBy: 'U004', reviewedAt: '2024-04-06T10:00:00Z',
     approvedBy: 'U004', approvedAt: '2024-04-06T10:30:00Z', remarks: 'Approved by Admin.',
   },
@@ -139,15 +139,17 @@ const STATUS = {
   draft:               { label: 'Draft',              bg: '#F3F4F6', color: '#374151', border: '#D1D5DB' },
   submitted:           { label: 'Submitted',          bg: C.warningBg, color: C.warning, border: C.warningBorder },
   under_review:        { label: 'Under Review',       bg: C.infoBg, color: C.info, border: C.infoBorder },
-  approved:            { label: 'Approved',           bg: C.successBg, color: C.success, border: C.successBorder },
+  forwarded_ro:        { label: 'Forwarded by RO',     bg: C.successBg, color: C.success, border: C.successBorder },
+  forwarded_rvo:       { label: 'Forwarded by RVO',    bg: '#CFFAFE', color: '#0E7490', border: '#67E8F9' },
   rejected:            { label: 'Rejected',           bg: C.dangerBg, color: C.danger, border: C.dangerBorder },
-  payment_processing:  { label: 'Pmt Processing',    bg: '#F3E8FF', color: '#7C3AED', border: '#C4B5FD' },
+  payment_processing:  { label: 'Payment Processing', bg: '#F3E8FF', color: '#7C3AED', border: '#C4B5FD' },
+  loc_processing:      { label: 'LOC Under Process',  bg: '#FEF9C3', color: '#92400E', border: '#FDE68A' },
   paid:                { label: 'Paid',               bg: '#D1FAE5', color: '#065F46', border: '#6EE7B7' },
 };
 
 const Badge = ({ status }) => {
   const s = STATUS[status] || STATUS.draft;
-  return <span style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}`, fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 20, letterSpacing: '0.03em' }}>{s.label.toUpperCase()}</span>;
+  return <span style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}`, fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 20, letterSpacing: '0.03em' }}>{s.label}</span>;
 };
 
 const Avatar = ({ text, size = 34, bg = C.primaryMid, color = C.primary }) => (
@@ -209,7 +211,7 @@ function LoginPage({ onLogin }) {
   );
 }
 
-function Sidebar({ user, page, onNav }) {
+function Sidebar({ user, page, onNav, onLogout }) {
   const canApprove = [ROLES.SUPERVISOR, ROLES.ADMIN].includes(user.role);
   const canViewAll = [ROLES.FINANCE, ROLES.ADMIN].includes(user.role);
   const isAdmin = user.role === ROLES.ADMIN;
@@ -256,15 +258,9 @@ function Sidebar({ user, page, onNav }) {
       </div>
 
       <div style={{ padding: '14px 14px 16px', borderTop: `1px solid ${C.border}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <Avatar text={user.av} />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name.split(' ').slice(0, 2).join(' ')}</div>
-            <div style={{ fontSize: 11, color: C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.designation}</div>
-          </div>
-        </div>
-        <div style={{ fontSize: 11, fontWeight: 600, color: C.primary, background: C.primaryLight, borderRadius: 6, padding: '4px 8px', textAlign: 'center', letterSpacing: '0.04em' }}>{user.role}</div>
-        <div style={{ fontSize: 10, color: C.textDisabled, marginTop: 8, textAlign: 'center' }}>Version 1.0.0</div>
+        <button onClick={onLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '7px 12px', border: `1px solid ${C.border}`, borderRadius: 8, background: '#fff', color: C.textSec, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif' }}>
+          <LogOut size={14} /> Sign Out
+        </button>
       </div>
     </div>
   );
@@ -291,9 +287,6 @@ function TopBar({ user, page, onLogout, pendingCount }) {
             <div style={{ fontSize: 10, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{user.role}</div>
           </div>
         </div>
-        <button onClick={onLogout} style={{ ...btnSecondary, padding: '6px 12px', fontSize: 13 }}>
-          <LogOut size={14} /> Sign Out
-        </button>
       </div>
     </div>
   );
@@ -303,7 +296,7 @@ function Dashboard({ user, bills, onNav }) {
   const isEmp = user.role === ROLES.EMPLOYEE;
   const scopedBills = isEmp ? bills.filter(b => b.employeeId === user.id) : bills;
   const pending = bills.filter(b => ['submitted', 'under_review'].includes(b.status));
-  const approved = scopedBills.filter(b => b.status === 'approved');
+  const approved = scopedBills.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status));
   const totalApproved = approved.reduce((s, b) => s + b.grandTotal, 0);
   const myDrafts = bills.filter(b => b.employeeId === user.id && b.status === 'draft');
 
@@ -314,17 +307,22 @@ function Dashboard({ user, bills, onNav }) {
     { label: 'Total Approved Amt', val: fmtAmt(totalApproved), Icon: IndianRupee, c: '#B45309', bg: '#FEF3C7' },
   ];
 
+  const forwardedRVO   = bills.filter(b => b.status === 'forwarded_rvo');
+  const forwardedRO    = bills.filter(b => b.status === 'forwarded_ro');
+  const locBills       = bills.filter(b => b.status === 'loc_processing');
   const actions = [
     ...(myDrafts.length > 0 ? [{ txt: `${myDrafts.length} draft bill(s) not yet submitted`, pri: 'High', nav: 'submit', due: 'Submit before month-end to avoid delays' }] : []),
     ...([ROLES.SUPERVISOR, ROLES.ADMIN].includes(user.role) && pending.length > 0 ? [{ txt: `${pending.length} TA bill(s) awaiting your approval`, pri: 'High', nav: 'approvals', due: 'Review within 3 working days as per APTRANSCO policy' }] : []),
     ...(isEmp && scopedBills.filter(b => b.status === 'submitted').length > 0 ? [{ txt: `${scopedBills.filter(b => b.status === 'submitted').length} bill(s) pending DEE review`, pri: 'Medium', nav: 'mybills', due: 'Pending with supervisor' }] : []),
+    ...(user.role === ROLES.FINANCE && forwardedRVO.length > 0 ? [{ txt: `${forwardedRVO.length} bill(s) forwarded by RVO pending Pass Order`, pri: 'High', nav: 'finance', due: 'Post vendor invoice (FV60) to issue Pass Order' }] : []),
+    ...(user.role === ROLES.FINANCE && forwardedRO.length > 0 ? [{ txt: `${forwardedRO.length} bill(s) forwarded by RO awaiting RVO clearance`, pri: 'Medium', nav: 'finance', due: 'Pending RVO forwarding before Pass Order can be issued' }] : []),
+    ...(user.role === ROLES.FINANCE && locBills.length > 0 ? [{ txt: `${locBills.length} bill(s) in LOC processing stage`, pri: 'Medium', nav: 'finance', due: 'Ensure LOC is cleared for disbursement' }] : []),
   ];
 
   const recentBills = [...scopedBills].sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0)).slice(0, 5);
 
   return (
     <div style={{ fontFamily: 'Segoe UI, sans-serif' }}>
-      <p style={{ color: C.textSec, margin: '0 0 24px' }}>Welcome back, {user.name.split(' ')[0]}. Here's your TA overview for this cycle.</p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
         {metrics.map((m, i) => (
@@ -340,7 +338,7 @@ function Dashboard({ user, bills, onNav }) {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }}>
         <div style={card}>
           <h3 style={{ fontSize: 15, fontWeight: 600, color: C.text, margin: '0 0 16px' }}>Pending Actions</h3>
           {actions.length === 0
@@ -373,38 +371,6 @@ function Dashboard({ user, bills, onNav }) {
           }
         </div>
 
-        <div>
-          <div style={card}>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: C.text, margin: '0 0 16px' }}>Bill Pipeline</h3>
-            {[
-              { s: 'draft', label: 'Draft' },
-              { s: 'submitted', label: 'Submitted' },
-              { s: 'under_review', label: 'Under Review' },
-              { s: 'approved', label: 'Approved' },
-              { s: 'rejected', label: 'Rejected' },
-            ].map(({ s }) => {
-              const cnt = scopedBills.filter(b => b.status === s).length;
-              const cfg = STATUS[s];
-              const isActive = s === 'under_review';
-              return (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: cnt > 0 ? cfg.color : C.border, flexShrink: 0, boxShadow: isActive && cnt > 0 ? `0 0 0 3px ${cfg.border}` : 'none' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, color: C.text }}>{cfg.label}</div>
-                    {isActive && cnt > 0 && <div style={{ fontSize: 11, background: cfg.bg, color: cfg.color, display: 'inline-block', padding: '1px 8px', borderRadius: 20, marginTop: 2 }}>In Progress</div>}
-                  </div>
-                  <span style={{ background: cnt > 0 ? cfg.bg : C.borderLight, color: cnt > 0 ? cfg.color : C.textDisabled, fontSize: 13, fontWeight: 600, padding: '2px 10px', borderRadius: 20 }}>{cnt}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{ ...card, marginTop: 16, background: C.primaryLight, border: `1px solid ${C.infoBorder}` }}>
-            <div style={{ fontSize: 12, color: C.info, fontWeight: 600, marginBottom: 6 }}>Total Approved Amount</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: C.success }}>{fmtAmt(totalApproved)}</div>
-            <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4 }}>{approved.length} bill(s) processed</div>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -791,14 +757,14 @@ function AuditLog({ log }) {
 }
 
 function Reports({ bills }) {
-  const approved = bills.filter(b => b.status === 'approved');
+  const approved = bills.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status));
   const totalAmt = approved.reduce((s, b) => s + b.grandTotal, 0);
   const avgAmt = bills.length ? Math.round(bills.reduce((s, b) => s + b.grandTotal, 0) / bills.length) : 0;
   const approvalRate = bills.length ? Math.round(approved.length / bills.length * 100) : 0;
 
   const employeeStats = USERS.filter(u => [ROLES.EMPLOYEE, ROLES.SUPERVISOR].includes(u.role)).map(u => {
     const eb = bills.filter(b => b.employeeId === u.id);
-    return { name: u.name, designation: u.designation, total: eb.length, approved: eb.filter(b => b.status === 'approved').length, rejected: eb.filter(b => b.status === 'rejected').length, amount: eb.filter(b => b.status === 'approved').reduce((s, b) => s + b.grandTotal, 0) };
+    return { name: u.name, designation: u.designation, total: eb.length, approved: eb.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status)).length, rejected: eb.filter(b => b.status === 'rejected').length, amount: eb.filter(b => ['forwarded_ro', 'forwarded_rvo'].includes(b.status)).reduce((s, b) => s + b.grandTotal, 0) };
   });
 
   return (
@@ -1137,14 +1103,15 @@ function FinanceProcessPage({ bills, onProcess }) {
   const [q, setQ] = useState('');
   const [sf, setSf] = useState('all');
 
-  const eligible = bills.filter(b => ['approved', 'payment_processing', 'paid'].includes(b.status));
+  const sfStatusMap = { approved: ['forwarded_ro', 'forwarded_rvo', 'payment_processing'], loc_processing: ['loc_processing'], paid: ['paid'] };
+  const eligible = bills.filter(b => ['forwarded_ro', 'forwarded_rvo', 'payment_processing', 'loc_processing', 'paid'].includes(b.status));
   const filtered = eligible.filter(b =>
     (q === '' || b.billNo.toLowerCase().includes(q.toLowerCase()) || b.employeeName.toLowerCase().includes(q.toLowerCase())) &&
-    (sf === 'all' || b.status === sf)
+    (sf === 'all' || (sfStatusMap[sf] || [sf]).includes(b.status))
   );
 
-  const readyCount    = bills.filter(b => b.status === 'approved').length;
-  const processingCnt = bills.filter(b => b.status === 'payment_processing').length;
+  const readyCount    = bills.filter(b => ['forwarded_ro', 'forwarded_rvo', 'payment_processing'].includes(b.status)).length;
+  const processingCnt = bills.filter(b => b.status === 'loc_processing').length;
   const paidCount     = bills.filter(b => b.status === 'paid').length;
   const paidAmt       = bills.filter(b => b.status === 'paid').reduce((s, b) => s + b.grandTotal, 0);
 
@@ -1157,10 +1124,10 @@ function FinanceProcessPage({ bills, onProcess }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 24 }}>
         {[
-          { label: 'Ready for Payment', val: readyCount,       c: C.warning,  bg: C.warningBg,  Icon: Clock },
-          { label: 'Pmt Processing',    val: processingCnt,    c: '#7C3AED',  bg: '#F3E8FF',    Icon: Activity },
-          { label: 'Paid Bills',        val: paidCount,        c: C.success,  bg: C.successBg,  Icon: CheckCircle },
-          { label: 'Total Disbursed',   val: fmtAmt(paidAmt),  c: '#065F46',  bg: '#D1FAE5',    Icon: IndianRupee },
+          { label: 'Bills Received',        val: readyCount,       c: C.warning,  bg: C.warningBg,  Icon: Clock },
+          { label: 'LOC Processing',        val: processingCnt,    c: '#7C3AED',  bg: '#F3E8FF',    Icon: Activity },
+          { label: 'Payment Under Review',  val: paidCount,        c: C.warning,  bg: C.warningBg,  Icon: Hourglass },
+          { label: 'Paid',                  val: fmtAmt(paidAmt),  c: '#065F46',  bg: '#D1FAE5',    Icon: IndianRupee },
         ].map((m, i) => (
           <div key={i} style={{ ...card, display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 44, height: 44, borderRadius: 10, background: m.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1181,8 +1148,8 @@ function FinanceProcessPage({ bills, onProcess }) {
         </div>
         <select value={sf} onChange={e => setSf(e.target.value)} style={{ padding: '9px 12px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 13, outline: 'none', fontFamily: 'Segoe UI, sans-serif', cursor: 'pointer', color: C.text, background: '#fff' }}>
           <option value="all">All Stages</option>
-          <option value="approved">Ready for Payment</option>
-          <option value="payment_processing">Processing</option>
+          <option value="approved">Pass Order</option>
+          <option value="loc_processing">LOC</option>
           <option value="paid">Paid</option>
         </select>
       </div>
@@ -1210,6 +1177,11 @@ function FinanceProcessPage({ bills, onProcess }) {
                     {b.status === 'paid'
                       ? <div>
                           <div style={{ fontSize: 12, fontWeight: 600, color: '#065F46' }}>✓ Posted</div>
+                          {b.paymentRef && <div style={{ fontSize: 11, color: C.textMuted }}>Ref: {b.paymentRef}</div>}
+                        </div>
+                      : b.status === 'loc_processing'
+                      ? <div>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>✓ LOC Posted</div>
                           {b.paymentRef && <div style={{ fontSize: 11, color: C.textMuted }}>Ref: {b.paymentRef}</div>}
                         </div>
                       : <button onClick={() => onProcess(b)} style={{ ...btnPrimary, padding: '6px 14px', fontSize: 12 }}>
@@ -1266,7 +1238,7 @@ function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
   };
 
   const handleApprove = (billId, remarks) => {
-    setBills(prev => prev.map(b => b.id === billId ? { ...b, status: 'approved', approvedBy: user.id, approvedAt: new Date().toISOString(), remarks } : b));
+    setBills(prev => prev.map(b => b.id === billId ? { ...b, status: 'forwarded_ro', approvedBy: user.id, approvedAt: new Date().toISOString(), remarks } : b));
     const b = bills.find(bb => bb.id === billId);
     if (b) addAudit('approved', billId, b.billNo, `Bill approved by ${user.name}. Remarks: ${remarks}`);
     setSelected(null);
@@ -1290,7 +1262,7 @@ function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
   const handlePostPayment = (billId, formData) => {
     const paymentRef = `DOC${Date.now().toString().slice(-8)}`;
     setBills(prev => prev.map(b => b.id === billId
-      ? { ...b, status: 'paid', paymentRef, paymentDate: new Date().toISOString(), paymentData: formData }
+      ? { ...b, status: 'loc_processing', paymentRef, paymentDate: new Date().toISOString(), paymentData: formData }
       : b
     ));
     const b = bills.find(bb => bb.id === billId);
@@ -1320,7 +1292,7 @@ function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
 
   return (
     <div style={{ fontFamily: 'Segoe UI, sans-serif', ...(page === 'finance_payment' ? { height: '100vh', overflow: 'hidden' } : { minHeight: '100vh' }), background: C.bg }}>
-      <Sidebar user={user} page={page} onNav={setPage} />
+      <Sidebar user={user} page={page} onNav={setPage} onLogout={onLogout} />
       <TopBar user={user} page={page} onLogout={onLogout} pendingCount={pending.length} />
       <main style={{ marginLeft: 256, marginTop: 60, padding: page === 'finance_payment' ? 0 : '24px 28px', ...(page === 'finance_payment' ? { height: 'calc(100vh - 60px)', overflow: 'hidden' } : { minHeight: 'calc(100vh - 60px)' }), background: C.bg }}>
         {renderPage()}
