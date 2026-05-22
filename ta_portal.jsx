@@ -987,8 +987,8 @@ function FinancePaymentForm({ bill, onPost, onPark, onClose }) {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 14 }}>
                   <div>
-                    <label style={L}>Supplier</label>
-                    <input value={hdr.supplier} onChange={e => setHdr({ ...hdr, supplier: e.target.value })} style={I} />
+                    <label style={L}>Employee ID</label>
+                    <input type="number" value={hdr.supplier} onChange={e => { if (e.target.value.length <= 5) setHdr({ ...hdr, supplier: e.target.value }); }} min="10000" max="99999" style={I} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <label style={L}>SGL Ind</label>
@@ -1031,7 +1031,7 @@ function FinancePaymentForm({ bill, onPost, onPark, onClose }) {
                 </div>
 
                 <div style={{ marginBottom: 12 }}>
-                  <label style={L}>Text</label>
+                  <label style={L}>Remarks</label>
                   <input value={hdr.text} onChange={e => setHdr({ ...hdr, text: e.target.value })} style={I} />
                 </div>
 
