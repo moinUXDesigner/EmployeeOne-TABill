@@ -422,8 +422,10 @@ function Dashboard({ user, bills, onNav }) {
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MODES = ['Own Vehicle','Bus','Rail','Auto','Boat','Air'];
 const mkJourney = () => ({ id: 'J' + Date.now(), dateFrom: '', dateTo: '', fromLoc: '', toLoc: '', purpose: '', mode: 'Bus', distKm: '', mileageRate: '', mileageAmt: 0, noDays: '', daRate: '', daAmt: 0, railClass: '', railAmt: '', roadConv: '', total: 0, remarks: '' });
+const mkJourneyV2 = () => ({ id: 'J' + Date.now() + Math.random().toString(36).slice(2), departurePlace: '', departureDate: '', departureTime: '', arrivalPlace: '', arrivalDate: '', arrivalTime: '', purpose: '', kindOfJourney: 'Official', travelClass: '', fare: '', distKm: '', mileageRate: '', mileageAmt: 0, conveyanceDA: '', lodgingCharges: '', daAmt: '', familyMembersAmt: '', total: 0 });
 
 function SubmitBillPage({ user, onSubmit }) {
+  const [formType, setFormType] = useState('form52');
   const [step, setStep] = useState(1);
   const [hdr, setHdr] = useState({ name: user.name, empId: user.empId, designation: user.designation, pay: user.role === ROLES.EMPLOYEE ? '94945' : '', hq: user.hq, org: 'SE/O & M/VIZIANAGARAM', month: MONTHS[new Date().getMonth() > 0 ? new Date().getMonth() - 1 : 11], year: String(new Date().getFullYear()) });
   const [journeys, setJourneys] = useState([mkJourney()]);
@@ -447,19 +449,40 @@ function SubmitBillPage({ user, onSubmit }) {
   const I = { width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'Segoe UI, sans-serif', color: C.text };
   const IR = { ...I, background: C.bg, color: C.textMuted };
 
+  const formToggle = (
+    <div style={{ display: 'flex', marginBottom: 20, background: '#fff', borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden', width: 'fit-content' }}>
+      {[['form52', 'APTC Form 52', 'TA Bill (Non-Gazetted)'], ['ttaltc', 'TA / TTA / LTC Claim', 'New Standard Form']].map(([val, label, sub]) => (
+        <button key={val} onClick={() => setFormType(val)} style={{ padding: '10px 22px', border: 'none', borderRight: val === 'form52' ? `1px solid ${C.border}` : 'none', cursor: 'pointer', background: formType === val ? C.primary : '#fff', color: formType === val ? '#fff' : C.textSec, fontSize: 13, fontWeight: formType === val ? 600 : 400, fontFamily: 'Segoe UI, sans-serif', lineHeight: 1.4 }}>
+          <div>{label}</div><div style={{ fontSize: 10, opacity: 0.75 }}>{sub}</div>
+        </button>
+      ))}
+    </div>
+  );
+
+  if (formType === 'ttaltc') return (
+    <div style={{ fontFamily: 'Segoe UI, sans-serif', maxWidth: 1060 }}>
+      {formToggle}
+      <TTALTCWizard user={user} onSubmit={onSubmit} />
+    </div>
+  );
+
   if (done) return (
-    <div style={{ textAlign: 'center', padding: '80px 40px', fontFamily: 'Segoe UI, sans-serif' }}>
-      <div style={{ width: 64, height: 64, borderRadius: '50%', background: C.successBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-        <CheckCircle size={32} color={C.success} />
+    <div style={{ fontFamily: 'Segoe UI, sans-serif', maxWidth: 1060 }}>
+      {formToggle}
+      <div style={{ textAlign: 'center', padding: '80px 40px' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: C.successBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <CheckCircle size={32} color={C.success} />
+        </div>
+        <h2 style={{ color: C.text, margin: '0 0 8px' }}>Bill Submitted Successfully!</h2>
+        <p style={{ color: C.textSec, margin: '0 0 24px' }}>Your TA bill has been submitted for supervisor approval. You will be notified once reviewed.</p>
+        <button onClick={() => { setDone(false); setStep(1); setJourneys([mkJourney()]); setCerts([false, false, false]); }} style={btnSecondary}>Submit Another Bill</button>
       </div>
-      <h2 style={{ color: C.text, margin: '0 0 8px' }}>Bill Submitted Successfully!</h2>
-      <p style={{ color: C.textSec, margin: '0 0 24px' }}>Your TA bill has been submitted for supervisor approval. You will be notified once reviewed.</p>
-      <button onClick={() => { setDone(false); setStep(1); setJourneys([mkJourney()]); setCerts([false, false, false]); }} style={btnSecondary}>Submit Another Bill</button>
     </div>
   );
 
   return (
     <div style={{ fontFamily: 'Segoe UI, sans-serif', maxWidth: 1060 }}>
+      {formToggle}
       <div style={{ display: 'flex', marginBottom: 24, background: '#fff', borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
         {['Bill Header', 'Journey Details', 'Certify & Submit'].map((s, i) => (
           <div key={i} onClick={() => i < step - 1 && setStep(i + 1)} style={{ flex: 1, padding: '12px 16px', textAlign: 'center', cursor: i < step - 1 ? 'pointer' : 'default', background: step === i + 1 ? C.primary : step > i + 1 ? C.successBg : '#fff', color: step === i + 1 ? '#fff' : step > i + 1 ? C.success : C.textMuted, fontSize: 13, fontWeight: step === i + 1 ? 600 : 400, borderRight: i < 2 ? `1px solid ${C.border}` : 'none' }}>
@@ -579,6 +602,398 @@ function SubmitBillPage({ user, onSubmit }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
             <button onClick={() => setStep(2)} style={btnSecondary}><ArrowLeft size={14} /> Back</button>
             <button onClick={() => { if (!certs.every(Boolean)) return; setBusy(true); setTimeout(() => { onSubmit({ ...hdr, journeys, totals, certs }); setBusy(false); setDone(true); }, 600); }} disabled={!certs.every(Boolean) || busy} style={{ ...btnPrimary, opacity: certs.every(Boolean) ? 1 : 0.45 }}>
+              <CheckSquare size={15} /> {busy ? 'Submitting…' : 'Submit Bill for Approval'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FamilyMembersTable({ ltcInfo, setLtcInfo, L, I }) {
+  const members = ['wife', 'sons', 'daughters', 'father', 'mother'];
+  const radioSt = { display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: 12, color: C.text };
+  return (
+    <div>
+      <label style={L}>List of Family Members</label>
+      <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              {['Member', 'Number', 'Whether Fully Dependent'].map(h => (
+                <th key={h} style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 14px', textAlign: h === 'Number' || h === 'Whether Fully Dependent' ? 'center' : 'left', background: C.bg, borderBottom: `1px solid ${C.border}` }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {members.map((m, i) => (
+              <tr key={m} style={{ background: i % 2 === 0 ? '#fff' : C.bg }}>
+                <td style={{ padding: '10px 14px', fontSize: 13, color: C.text, borderBottom: `1px solid ${C.borderLight}`, textTransform: 'capitalize' }}>{m}</td>
+                <td style={{ padding: '10px 14px', textAlign: 'center', borderBottom: `1px solid ${C.borderLight}` }}>
+                  <input type="number" min="0" value={ltcInfo.familyMembers[m].number} onChange={e => setLtcInfo({ ...ltcInfo, familyMembers: { ...ltcInfo.familyMembers, [m]: { ...ltcInfo.familyMembers[m], number: e.target.value } } })} style={{ ...I, width: 70, textAlign: 'center' }} placeholder="0" />
+                </td>
+                <td style={{ padding: '10px 14px', textAlign: 'center', borderBottom: `1px solid ${C.borderLight}` }}>
+                  <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+                    {[['Yes', true], ['No', false]].map(([label, val]) => (
+                      <label key={label} style={radioSt}>
+                        <input type="radio" checked={ltcInfo.familyMembers[m].fullyDependent === val} onChange={() => setLtcInfo({ ...ltcInfo, familyMembers: { ...ltcInfo.familyMembers, [m]: { ...ltcInfo.familyMembers[m], fullyDependent: val } } })} style={{ accentColor: C.primary }} />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function TTALTCWizard({ user, onSubmit }) {
+  const [step, setStep] = useState(1);
+  const [hdr, setHdr] = useState({
+    name: user.name, empId: user.empId, designation: user.designation,
+    pay: user.role === ROLES.EMPLOYEE ? '94945' : '', grade: '',
+    office: 'SE/O & M/VIZIANAGARAM', hq: user.hq,
+    month: MONTHS[new Date().getMonth() > 0 ? new Date().getMonth() - 1 : 11],
+    year: String(new Date().getFullYear()),
+    claimType: 'TA', dateSubmittedToController: '',
+  });
+  const [ltcInfo, setLtcInfo] = useState({
+    blockPeriod: '', spouseIsGovtEmployee: null,
+    familyMembers: {
+      wife: { number: '', fullyDependent: null }, sons: { number: '', fullyDependent: null },
+      daughters: { number: '', fullyDependent: null }, father: { number: '', fullyDependent: null },
+      mother: { number: '', fullyDependent: null },
+    },
+  });
+  const [taInfo, setTaInfo] = useState({ boardingConcessional: null, lodgingConcessional: null, cancellationUnavoidable: null });
+  const [cancellationCharges, setCancellationCharges] = useState([]);
+  const [journeys, setJourneys] = useState([mkJourneyV2()]);
+  const [ttaCharges, setTtaCharges] = useState({ packingCharges: '', unpackingCharges: '', disturbanceAllowance: '', personalEffects: '' });
+  const [bankInfo, setBankInfo] = useState({ bankAccountNo: '', ifscCode: '', bankName: '' });
+  const [lessAdvance, setLessAdvance] = useState('');
+  const [certs, setCerts] = useState([false, false, false]);
+  const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const cancellationTotal = cancellationCharges.reduce((s, c) => s + (+c.amount || 0), 0);
+  const journeyTotal = journeys.reduce((s, j) => s + (+j.total || 0), 0);
+  const ttaTotal = (+ttaCharges.packingCharges || 0) + (+ttaCharges.unpackingCharges || 0) + (+ttaCharges.disturbanceAllowance || 0) + (+ttaCharges.personalEffects || 0);
+  const grandTotal = cancellationTotal + journeyTotal + ttaTotal;
+  const netPayable = grandTotal - (+lessAdvance || 0);
+  const totals = { mileage: journeys.reduce((s, j) => s + (+j.mileageAmt || 0), 0), da: journeys.reduce((s, j) => s + (+j.daAmt || 0), 0), rail: 0, road: 0, grand: grandTotal };
+
+  const updJ = (id, f, v) => setJourneys(js => js.map(j => {
+    if (j.id !== id) return j;
+    const u = { ...j, [f]: v };
+    if (f === 'mileageRate' || f === 'distKm') u.mileageAmt = (+u.distKm || 0) * (+u.mileageRate || 0);
+    u.total = (+u.fare || 0) + (+u.mileageAmt || 0) + (+u.conveyanceDA || 0) + (+u.lodgingCharges || 0) + (+u.daAmt || 0) + (+u.familyMembersAmt || 0);
+    return u;
+  }));
+  const mkCRow = () => ({ id: 'C' + Date.now(), date: '', from: '', to: '', ticketNo: '', trainFlightNo: '', amount: '' });
+  const updC = (id, f, v) => setCancellationCharges(rows => rows.map(r => r.id === id ? { ...r, [f]: v } : r));
+
+  const L = { fontSize: 12, fontWeight: 600, color: C.textSec, marginBottom: 4, display: 'block' };
+  const I = { width: '100%', padding: '8px 10px', border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 13, outline: 'none', boxSizing: 'border-box', fontFamily: 'Segoe UI, sans-serif', color: C.text };
+  const IR = { ...I, background: C.bg, color: C.textMuted };
+  const radioSt = { display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, color: C.text };
+  const stepLabels = ['Bill Details', 'Claim Info', 'Cancellations', 'Journey Details', 'Summary'];
+  const TH = { fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '10px 12px', textAlign: 'left', background: C.bg, borderBottom: `1px solid ${C.border}` };
+
+  if (done) return (
+    <div style={{ textAlign: 'center', padding: '80px 40px' }}>
+      <div style={{ width: 64, height: 64, borderRadius: '50%', background: C.successBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+        <CheckCircle size={32} color={C.success} />
+      </div>
+      <h2 style={{ color: C.text, margin: '0 0 8px' }}>Bill Submitted Successfully!</h2>
+      <p style={{ color: C.textSec, margin: '0 0 24px' }}>Your {hdr.claimType} bill has been submitted for approval. You will be notified once reviewed.</p>
+      <button onClick={() => { setDone(false); setStep(1); }} style={btnSecondary}>Submit Another Bill</button>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ display: 'flex', marginBottom: 24, background: '#fff', borderRadius: 10, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
+        {stepLabels.map((s, i) => (
+          <div key={i} onClick={() => i < step - 1 && setStep(i + 1)} style={{ flex: 1, padding: '12px 16px', textAlign: 'center', cursor: i < step - 1 ? 'pointer' : 'default', background: step === i + 1 ? C.primary : step > i + 1 ? C.successBg : '#fff', color: step === i + 1 ? '#fff' : step > i + 1 ? C.success : C.textMuted, fontSize: 13, fontWeight: step === i + 1 ? 600 : 400, borderRight: i < stepLabels.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+            {step > i + 1 ? '✓ ' : `${i + 1}. `}{s}
+          </div>
+        ))}
+      </div>
+
+      {step === 1 && (
+        <div style={card}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, paddingBottom: 14, borderBottom: `1px solid ${C.border}` }}>
+            <div style={{ width: 32, height: 32, background: C.primaryLight, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={16} color={C.primary} /></div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.text }}>TA / TTA / LTC Claim</div>
+              <div style={{ fontSize: 12, color: C.textMuted }}>Transmission Corporation of Andhra Pradesh Limited</div>
+            </div>
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={L}>Claim Type</label>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {[['TA', 'Travelling Allowance'], ['TTA', 'Transfer TA'], ['LTC', 'Leave Travel Concession']].map(([val, desc]) => (
+                <button key={val} onClick={() => setHdr({ ...hdr, claimType: val })} style={{ padding: '8px 18px', borderRadius: 8, border: `2px solid ${hdr.claimType === val ? C.primary : C.border}`, background: hdr.claimType === val ? C.primaryLight : '#fff', color: hdr.claimType === val ? C.primary : C.textSec, fontWeight: hdr.claimType === val ? 700 : 400, fontSize: 13, cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif' }}>
+                  <div style={{ fontWeight: 700 }}>{val}</div><div style={{ fontSize: 11, opacity: 0.75 }}>{desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div><label style={L}>Employee Name</label><input value={hdr.name} readOnly style={IR} /></div>
+            <div><label style={L}>Designation</label><input value={hdr.designation} readOnly style={IR} /></div>
+            <div><label style={L}>Basic Pay (₹)</label><input type="number" value={hdr.pay} onChange={e => setHdr({ ...hdr, pay: e.target.value })} style={I} /></div>
+            <div><label style={L}>Grade</label><input value={hdr.grade} onChange={e => setHdr({ ...hdr, grade: e.target.value })} style={I} placeholder="e.g. Grade-III" /></div>
+            <div><label style={L}>Office</label><input value={hdr.office} onChange={e => setHdr({ ...hdr, office: e.target.value })} style={I} /></div>
+            <div><label style={L}>Headquarters</label><input value={hdr.hq} onChange={e => setHdr({ ...hdr, hq: e.target.value })} style={I} /></div>
+            <div><label style={L}>Month</label><select value={hdr.month} onChange={e => setHdr({ ...hdr, month: e.target.value })} style={{ ...I, cursor: 'pointer' }}>{MONTHS.map(m => <option key={m}>{m}</option>)}</select></div>
+            <div><label style={L}>Year</label><select value={hdr.year} onChange={e => setHdr({ ...hdr, year: e.target.value })} style={{ ...I, cursor: 'pointer' }}>{[2024, 2025, 2026].map(y => <option key={y}>{y}</option>)}</select></div>
+            <div><label style={L}>Date of Submission to Controlling Officer</label><input type="date" value={hdr.dateSubmittedToController} onChange={e => setHdr({ ...hdr, dateSubmittedToController: e.target.value })} style={I} /></div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+            <button onClick={() => setStep(2)} style={btnPrimary}>Next →</button>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div style={card}>
+          <h3 style={{ margin: '0 0 20px', fontSize: 15, fontWeight: 600, color: C.text }}>
+            {hdr.claimType === 'LTC' ? '7. LTC Details & Family Members' : hdr.claimType === 'TTA' ? '8. TTA — Family Members' : 'TA — Boarding / Lodging & Cancellation'}
+          </h3>
+          {hdr.claimType === 'LTC' && (
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                <div><label style={L}>Block Period</label><input value={ltcInfo.blockPeriod} onChange={e => setLtcInfo({ ...ltcInfo, blockPeriod: e.target.value })} style={I} placeholder="e.g. 2022–2025" /></div>
+                <div>
+                  <label style={L}>Whether spouse is Board / Govt. employee</label>
+                  <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+                    {[['Yes', true], ['No', false]].map(([label, val]) => (<label key={label} style={radioSt}><input type="radio" checked={ltcInfo.spouseIsGovtEmployee === val} onChange={() => setLtcInfo({ ...ltcInfo, spouseIsGovtEmployee: val })} style={{ accentColor: C.primary }} />{label}</label>))}
+                  </div>
+                </div>
+              </div>
+              <FamilyMembersTable ltcInfo={ltcInfo} setLtcInfo={setLtcInfo} L={L} I={I} />
+            </div>
+          )}
+          {hdr.claimType === 'TTA' && <FamilyMembersTable ltcInfo={ltcInfo} setLtcInfo={setLtcInfo} L={L} I={I} />}
+          {hdr.claimType === 'TA' && (
+            <div>
+              <div style={{ marginBottom: 18 }}>
+                <label style={{ ...L, marginBottom: 10 }}>Boarding provided at concessional rates?</label>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  {[['Yes', true], ['No', false]].map(([label, val]) => (<label key={label} style={radioSt}><input type="radio" checked={taInfo.boardingConcessional === val} onChange={() => setTaInfo({ ...taInfo, boardingConcessional: val })} style={{ accentColor: C.primary }} />{label}</label>))}
+                </div>
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <label style={{ ...L, marginBottom: 10 }}>Lodging provided at concessional rates?</label>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  {[['Yes', true], ['No', false]].map(([label, val]) => (<label key={label} style={radioSt}><input type="radio" checked={taInfo.lodgingConcessional === val} onChange={() => setTaInfo({ ...taInfo, lodgingConcessional: val })} style={{ accentColor: C.primary }} />{label}</label>))}
+                </div>
+              </div>
+              <div>
+                <label style={{ ...L, marginBottom: 10 }}>Whether cancellation of journey is unavoidable and beyond control of employee?</label>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  {[['Yes', 'yes'], ['No', 'no'], ['Not Applicable', 'na']].map(([label, val]) => (<label key={label} style={radioSt}><input type="radio" checked={taInfo.cancellationUnavoidable === val} onChange={() => setTaInfo({ ...taInfo, cancellationUnavoidable: val })} style={{ accentColor: C.primary }} />{label}</label>))}
+                </div>
+              </div>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
+            <button onClick={() => setStep(1)} style={btnSecondary}><ArrowLeft size={14} /> Back</button>
+            <button onClick={() => setStep(3)} style={btnPrimary}>Next →</button>
+          </div>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div><h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: C.text }}>Cancellation Charges</h3><p style={{ margin: '2px 0 0', fontSize: 12, color: C.textMuted }}>Add rows for any cancelled journey tickets (leave empty if not applicable)</p></div>
+            <button onClick={() => setCancellationCharges([...cancellationCharges, mkCRow()])} style={btnSecondary}><Plus size={14} /> Add Row</button>
+          </div>
+          {cancellationCharges.length === 0 ? (
+            <div style={{ ...card, textAlign: 'center', padding: '32px', color: C.textMuted, marginBottom: 14 }}><p style={{ margin: 0 }}>No cancellation charges. Click "Add Row" if applicable, or skip to next step.</p></div>
+          ) : (
+            <div style={{ ...card, padding: 0, overflow: 'auto', marginBottom: 14 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
+                <thead><tr>{['Date', 'From', 'To', 'Ticket No.', 'Train / Flight / Bus No.', 'Amount (₹)', ''].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+                <tbody>
+                  {cancellationCharges.map(row => (
+                    <tr key={row.id}>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input type="date" value={row.date} onChange={e => updC(row.id, 'date', e.target.value)} style={{ ...I, width: 140 }} /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input value={row.from} onChange={e => updC(row.id, 'from', e.target.value)} style={{ ...I, width: 120 }} placeholder="From" /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input value={row.to} onChange={e => updC(row.id, 'to', e.target.value)} style={{ ...I, width: 120 }} placeholder="To" /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input value={row.ticketNo} onChange={e => updC(row.id, 'ticketNo', e.target.value)} style={{ ...I, width: 130 }} placeholder="Ticket No." /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input value={row.trainFlightNo} onChange={e => updC(row.id, 'trainFlightNo', e.target.value)} style={{ ...I, width: 150 }} placeholder="Train / Flight No." /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><input type="number" value={row.amount} onChange={e => updC(row.id, 'amount', e.target.value)} style={{ ...I, width: 110 }} placeholder="0" /></td>
+                      <td style={{ padding: '8px 10px', borderBottom: `1px solid ${C.borderLight}` }}><button onClick={() => setCancellationCharges(rows => rows.filter(r => r.id !== row.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.danger, padding: 2 }}><X size={15} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {cancellationCharges.length > 0 && <div style={{ textAlign: 'right', fontSize: 13, color: C.textSec, marginBottom: 14 }}>Total Cancellation Charges: <strong style={{ color: C.text }}>{fmtAmt(cancellationTotal)}</strong></div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
+            <button onClick={() => setStep(2)} style={btnSecondary}><ArrowLeft size={14} /> Back</button>
+            <button onClick={() => setStep(4)} style={btnPrimary}>Next: Journey Details →</button>
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div><h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: C.text }}>12. Details of Journey</h3><p style={{ margin: '2px 0 0', fontSize: 12, color: C.textMuted }}>Add one row per journey leg (outward + return separately)</p></div>
+            <button onClick={() => setJourneys([...journeys, mkJourneyV2()])} style={btnSecondary}><Plus size={14} /> Add Journey Row</button>
+          </div>
+          {journeys.map((j, idx) => (
+            <div key={j.id} style={{ ...card, marginBottom: 14, borderLeft: `3px solid ${C.primary}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.primary }}>Journey {String.fromCharCode(65 + idx)}</span>
+                {journeys.length > 1 && <button onClick={() => setJourneys(journeys.filter(jj => jj.id !== j.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.danger, padding: 2 }}><X size={15} /></button>}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div style={{ background: C.bg, borderRadius: 8, padding: '12px', border: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Departure (a)</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <div style={{ gridColumn: '1 / -1' }}><label style={L}>Place</label><input value={j.departurePlace} onChange={e => updJ(j.id, 'departurePlace', e.target.value)} style={I} placeholder="From" /></div>
+                    <div><label style={L}>Date</label><input type="date" value={j.departureDate} onChange={e => updJ(j.id, 'departureDate', e.target.value)} style={{ ...I, minWidth: 0 }} /></div>
+                    <div><label style={L}>Time</label><input type="time" value={j.departureTime} onChange={e => updJ(j.id, 'departureTime', e.target.value)} style={{ ...I, minWidth: 0 }} /></div>
+                  </div>
+                </div>
+                <div style={{ background: C.bg, borderRadius: 8, padding: '12px', border: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>Arrival (b)</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <div style={{ gridColumn: '1 / -1' }}><label style={L}>Place</label><input value={j.arrivalPlace} onChange={e => updJ(j.id, 'arrivalPlace', e.target.value)} style={I} placeholder="To" /></div>
+                    <div><label style={L}>Date</label><input type="date" value={j.arrivalDate} onChange={e => updJ(j.id, 'arrivalDate', e.target.value)} style={{ ...I, minWidth: 0 }} /></div>
+                    <div><label style={L}>Time</label><input type="time" value={j.arrivalTime} onChange={e => updJ(j.id, 'arrivalTime', e.target.value)} style={{ ...I, minWidth: 0 }} /></div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
+                <div><label style={L}>Purpose of Journey (c)</label><input value={j.purpose} onChange={e => updJ(j.id, 'purpose', e.target.value)} style={I} placeholder="Official purpose and reference order..." /></div>
+                <div><label style={L}>Kind of Journey (d)</label><select value={j.kindOfJourney} onChange={e => updJ(j.id, 'kindOfJourney', e.target.value)} style={{ ...I, cursor: 'pointer' }}>{['Official', 'Transfer', 'LTC', 'TTA', 'Sports'].map(k => <option key={k}>{k}</option>)}</select></div>
+                <div><label style={L}>Class (e)</label><input value={j.travelClass} onChange={e => updJ(j.id, 'travelClass', e.target.value)} style={I} placeholder="e.g. 2AC, SL" /></div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8,minmax(0,1fr))', gap: 8 }}>
+                <div><label style={L}>Fare (f) ₹</label><input type="number" value={j.fare} onChange={e => updJ(j.id, 'fare', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>KM (g)</label><input type="number" value={j.distKm} onChange={e => updJ(j.id, 'distKm', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>Rate ₹/km</label><input type="number" value={j.mileageRate} onChange={e => updJ(j.id, 'mileageRate', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>Mileage ₹</label><input readOnly value={j.mileageAmt || 0} style={IR} /></div>
+                <div><label style={L}>Conv/DA (h) ₹</label><input type="number" value={j.conveyanceDA} onChange={e => updJ(j.id, 'conveyanceDA', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>Lodging (i) ₹</label><input type="number" value={j.lodgingCharges} onChange={e => updJ(j.id, 'lodgingCharges', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>DA (j) ₹</label><input type="number" value={j.daAmt} onChange={e => updJ(j.id, 'daAmt', e.target.value)} style={I} placeholder="0" /></div>
+                <div><label style={L}>Family (k) ₹</label><input type="number" value={j.familyMembersAmt} onChange={e => updJ(j.id, 'familyMembersAmt', e.target.value)} style={I} placeholder="0" /></div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+                <div style={{ width: 160 }}><label style={L}>Total (l) ₹</label><input readOnly value={j.total || 0} style={{ ...IR, fontWeight: 700, color: C.primary, background: C.primaryLight, border: `1px solid ${C.infoBorder}` }} /></div>
+              </div>
+            </div>
+          ))}
+          <div style={{ ...card, background: C.primaryLight, border: `1px solid ${C.infoBorder}`, marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, color: C.textSec }}>Total of all journeys (Section 12):</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: C.primary }}>{fmtAmt(journeyTotal)}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <button onClick={() => setStep(3)} style={btnSecondary}><ArrowLeft size={14} /> Back</button>
+            <button onClick={() => setStep(5)} style={btnPrimary}>Review & Submit →</button>
+          </div>
+        </div>
+      )}
+
+      {step === 5 && (
+        <div>
+          {hdr.claimType === 'TTA' && (
+            <div style={{ ...card, marginBottom: 14 }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: C.text }}>TTA Additional Charges</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div><label style={L}>13. Packing Charges (₹)</label><input type="number" value={ttaCharges.packingCharges} onChange={e => setTtaCharges({ ...ttaCharges, packingCharges: e.target.value })} style={I} placeholder="0" /></div>
+                <div><label style={L}>14. Unpacking Charges (₹)</label><input type="number" value={ttaCharges.unpackingCharges} onChange={e => setTtaCharges({ ...ttaCharges, unpackingCharges: e.target.value })} style={I} placeholder="0" /></div>
+                <div><label style={L}>15. Disturbance Allowance (₹)</label><input type="number" value={ttaCharges.disturbanceAllowance} onChange={e => setTtaCharges({ ...ttaCharges, disturbanceAllowance: e.target.value })} style={I} placeholder="0" /></div>
+                <div><label style={L}>16. Personal Effects (₹)</label><input type="number" value={ttaCharges.personalEffects} onChange={e => setTtaCharges({ ...ttaCharges, personalEffects: e.target.value })} style={I} placeholder="0" /></div>
+              </div>
+            </div>
+          )}
+          <div style={{ ...card, marginBottom: 14 }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: C.text }}>Total Claim</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12 }}>
+              <thead><tr><th style={{ ...TH, textAlign: 'left' }}>Item</th><th style={{ ...TH, textAlign: 'right' }}>Amount (₹)</th></tr></thead>
+              <tbody>
+                {[
+                  ['Cancellation Charges', cancellationTotal],
+                  ['Journey Details Total', journeyTotal],
+                  ...(hdr.claimType === 'TTA' ? [
+                    ['13. Packing Charges', +ttaCharges.packingCharges || 0],
+                    ['14. Unpacking Charges', +ttaCharges.unpackingCharges || 0],
+                    ['15. Disturbance Allowance', +ttaCharges.disturbanceAllowance || 0],
+                    ['16. Personal Effects', +ttaCharges.personalEffects || 0],
+                  ] : []),
+                ].map(([label, val]) => (
+                  <tr key={label}><td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.borderLight}`, fontSize: 13, color: C.text }}>{label}</td><td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.borderLight}`, fontSize: 13, fontWeight: 600, color: C.text, textAlign: 'right' }}>{fmtAmt(val)}</td></tr>
+                ))}
+                <tr><td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.border}`, fontSize: 14, fontWeight: 700, color: C.text }}>TOTAL</td><td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.border}`, fontSize: 14, fontWeight: 700, color: C.primary, textAlign: 'right' }}>{fmtAmt(grandTotal)}</td></tr>
+                <tr>
+                  <td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.borderLight}`, fontSize: 13, color: C.textSec }}>LESS ADVANCE</td>
+                  <td style={{ padding: '10px 12px', borderBottom: `1px solid ${C.borderLight}` }}><input type="number" value={lessAdvance} onChange={e => setLessAdvance(e.target.value)} style={{ ...I, textAlign: 'right', width: 130, marginLeft: 'auto', display: 'block' }} placeholder="0" /></td>
+                </tr>
+                <tr><td style={{ padding: '10px 12px', fontSize: 14, fontWeight: 700, color: C.text }}>NET PAYABLE / RECOVERABLE</td><td style={{ padding: '10px 12px', fontSize: 16, fontWeight: 700, color: netPayable >= 0 ? C.success : C.danger, textAlign: 'right' }}>{fmtAmt(Math.abs(netPayable))}{netPayable < 0 ? ' (Recoverable)' : ''}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style={{ ...card, marginBottom: 14 }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: C.text }}>Bank Details</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <div><label style={L}>Bank A/c No.</label><input value={bankInfo.bankAccountNo} onChange={e => setBankInfo({ ...bankInfo, bankAccountNo: e.target.value })} style={I} placeholder="Account number" /></div>
+              <div><label style={L}>IFSC Code</label><input value={bankInfo.ifscCode} onChange={e => setBankInfo({ ...bankInfo, ifscCode: e.target.value })} style={I} placeholder="e.g. SBIN0001234" /></div>
+              <div><label style={L}>Bank Name</label><input value={bankInfo.bankName} onChange={e => setBankInfo({ ...bankInfo, bankName: e.target.value })} style={I} placeholder="e.g. State Bank of India" /></div>
+            </div>
+          </div>
+          <div style={card}>
+            <h4 style={{ fontSize: 14, fontWeight: 600, color: C.textSec, margin: '0 0 12px' }}>Mandatory Certifications</h4>
+            {[
+              'I certify that I have preferred the TA/TTA/LTC claim according to the Board rules and the information furnished is correct.',
+              'I certify that the claim has not been preferred before and the journey was performed for official bonafide purpose only.',
+              'I certify that no advance has been drawn / the advance drawn has been deducted in the bill.',
+            ].map((txt, i) => (
+              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, cursor: 'pointer' }}>
+                <input type="checkbox" checked={certs[i]} onChange={e => { const c = [...certs]; c[i] = e.target.checked; setCerts(c); }} style={{ marginTop: 2, accentColor: C.primary, width: 15, height: 15 }} />
+                <span style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{txt}</span>
+              </label>
+            ))}
+            {!certs.every(Boolean) && (
+              <div style={{ background: C.warningBg, border: `1px solid ${C.warningBorder}`, color: C.warning, padding: '10px 14px', borderRadius: 8, fontSize: 13, marginTop: 8 }}>
+                ⚠ Please accept all three certifications before submitting this bill.
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
+            <button onClick={() => setStep(4)} style={btnSecondary}><ArrowLeft size={14} /> Back</button>
+            <button onClick={() => {
+              if (!certs.every(Boolean)) return;
+              setBusy(true);
+              setTimeout(() => {
+                onSubmit({
+                  ...hdr, org: hdr.office,
+                  journeys: journeys.map(j => ({ ...j, fromLoc: j.departurePlace, toLoc: j.arrivalPlace, dateFrom: j.departureDate, dateTo: j.arrivalDate, railAmt: +j.fare || 0, railClass: j.travelClass, roadConv: +j.conveyanceDA || 0 })),
+                  totals, certs,
+                  formVersion: 'ttaltc', claimType: hdr.claimType, grade: hdr.grade, office: hdr.office,
+                  dateSubmittedToController: hdr.dateSubmittedToController,
+                  blockPeriod: ltcInfo.blockPeriod, spouseIsGovtEmployee: ltcInfo.spouseIsGovtEmployee, familyMembers: ltcInfo.familyMembers,
+                  boardingConcessional: taInfo.boardingConcessional, lodgingConcessional: taInfo.lodgingConcessional, cancellationUnavoidable: taInfo.cancellationUnavoidable,
+                  cancellationCharges,
+                  packingCharges: ttaCharges.packingCharges, unpackingCharges: ttaCharges.unpackingCharges,
+                  disturbanceAllowance: ttaCharges.disturbanceAllowance, personalEffects: ttaCharges.personalEffects,
+                  lessAdvance, bankAccountNo: bankInfo.bankAccountNo, ifscCode: bankInfo.ifscCode, bankName: bankInfo.bankName,
+                });
+                setBusy(false); setDone(true);
+              }, 600);
+            }} disabled={!certs.every(Boolean) || busy} style={{ ...btnPrimary, opacity: certs.every(Boolean) ? 1 : 0.45 }}>
               <CheckSquare size={15} /> {busy ? 'Submitting…' : 'Submit Bill for Approval'}
             </button>
           </div>
@@ -715,7 +1130,7 @@ function BillDetail({ bill, currentUser, onClose, onApprove, onReject, onPassOrd
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: C.text }}>{bill.billNo}</h2>
               <Badge status={bill.status} />
             </div>
-            <p style={{ margin: '3px 0 0', fontSize: 12, color: C.textMuted }}>A.P.T.C. Form 52 — Travelling Allowance Bill for Non-Gazetted Establishment</p>
+            <p style={{ margin: '3px 0 0', fontSize: 12, color: C.textMuted }}>{bill.formVersion === 'ttaltc' ? `${bill.claimType || 'TA'} / TTA / LTC Claim — TCAPL Standard Form` : 'A.P.T.C. Form 52 — Travelling Allowance Bill for Non-Gazetted Establishment'}</p>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: C.textMuted }}><X size={20} /></button>
         </div>
@@ -767,6 +1182,44 @@ function BillDetail({ bill, currentUser, onClose, onApprove, onReject, onPassOrd
               <div style={{ fontSize: 30, fontWeight: 700, color: '#fff' }}>{fmtAmt(bill.grandTotal)}</div>
             </div>
           </div>
+
+          {bill.formVersion === 'ttaltc' && (
+            <div style={{ ...card, marginBottom: 16 }}>
+              <h4 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Claim Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: bill.bankAccountNo || (bill.cancellationCharges && bill.cancellationCharges.length > 0) ? 16 : 0 }}>
+                {[
+                  ['Claim Type', bill.claimType],
+                  ['Grade', bill.grade || '—'],
+                  ['Office', bill.office || '—'],
+                  ['Date Submitted to Controller', bill.dateSubmittedToController || '—'],
+                  ...(bill.claimType === 'LTC' ? [['Block Period', bill.blockPeriod || '—'], ['Spouse Govt. Employee', bill.spouseIsGovtEmployee === true ? 'Yes' : bill.spouseIsGovtEmployee === false ? 'No' : '—']] : []),
+                  ...(bill.claimType === 'TA' ? [['Boarding Concessional', bill.boardingConcessional === true ? 'Yes' : bill.boardingConcessional === false ? 'No' : '—'], ['Lodging Concessional', bill.lodgingConcessional === true ? 'Yes' : bill.lodgingConcessional === false ? 'No' : '—']] : []),
+                ].map(([k, v]) => (
+                  <div key={k}><div style={{ fontSize: 11, color: C.textMuted, marginBottom: 2 }}>{k}</div><div style={{ fontSize: 14, fontWeight: 500, color: C.text }}>{v}</div></div>
+                ))}
+              </div>
+              {bill.bankAccountNo && (
+                <div style={{ padding: '10px 14px', background: C.bg, borderRadius: 8, border: `1px solid ${C.border}`, marginBottom: bill.cancellationCharges && bill.cancellationCharges.length > 0 ? 12 : 0 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Bank Details</div>
+                  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                    {[['A/c No.', bill.bankAccountNo], ['IFSC', bill.ifscCode || '—'], ['Bank', bill.bankName || '—']].map(([k, v]) => (
+                      <div key={k}><span style={{ fontSize: 11, color: C.textMuted }}>{k}: </span><span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{v}</span></div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {bill.cancellationCharges && bill.cancellationCharges.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Cancellation Charges</div>
+                  {bill.cancellationCharges.map((c, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 16, padding: '6px 0', borderBottom: `1px solid ${C.borderLight}`, fontSize: 12, color: C.text }}>
+                      <span>{c.date || '—'}</span><span style={{ flex: 1 }}>{c.from} → {c.to}</span><span style={{ fontWeight: 600 }}>{fmtAmt(c.amount)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ ...card, marginBottom: 16 }}>
             <h4 style={{ margin: '0 0 14px', fontSize: 13, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Approval Trail</h4>
@@ -1477,11 +1930,23 @@ function AppShell({ user, onLogout, bills, setBills, auditLog, setAuditLog }) {
     const billNo = `TA/${data.year}/${mo}/${String(Math.floor(Math.random() * 900) + 100)}`;
     const newBill = {
       id, billNo, employeeId: user.id, employeeName: user.name, designation: data.designation,
-      empId: data.empId, pay: +data.pay, hq: data.hq, dept: user.dept, org: data.org,
+      empId: data.empId, pay: +data.pay, hq: data.hq, dept: user.dept, org: data.org || data.office,
       month: data.month, year: +data.year, journeys: data.journeys,
       totalMileage: data.totals.mileage, totalDA: data.totals.da, totalRailway: data.totals.rail, totalRoad: data.totals.road, grandTotal: data.totals.grand,
       certs: data.certs, status: 'submitted', submittedAt: new Date().toISOString(),
       reviewedBy: null, reviewedAt: null, approvedBy: null, approvedAt: null, remarks: '',
+      ...(data.formVersion === 'ttaltc' && {
+        formVersion: 'ttaltc', claimType: data.claimType, grade: data.grade, office: data.office,
+        blockPeriod: data.blockPeriod, spouseIsGovtEmployee: data.spouseIsGovtEmployee,
+        familyMembers: data.familyMembers, boardingConcessional: data.boardingConcessional,
+        lodgingConcessional: data.lodgingConcessional, cancellationUnavoidable: data.cancellationUnavoidable,
+        dateSubmittedToController: data.dateSubmittedToController,
+        cancellationCharges: data.cancellationCharges,
+        packingCharges: data.packingCharges, unpackingCharges: data.unpackingCharges,
+        disturbanceAllowance: data.disturbanceAllowance, personalEffects: data.personalEffects,
+        lessAdvance: data.lessAdvance, bankAccountNo: data.bankAccountNo,
+        ifscCode: data.ifscCode, bankName: data.bankName,
+      }),
     };
     setBills(prev => [newBill, ...prev]);
     addAudit('submitted', id, billNo, `Bill submitted. Grand Total: ${fmtAmt(data.totals.grand)}`);
